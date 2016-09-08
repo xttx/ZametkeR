@@ -819,13 +819,6 @@ Public Class Form1
         If newname = "" Then Exit Sub
 
         If Not newname = node.Text Then newname = getNewName(node, newname)
-        'If node.Parent Is Nothing Then
-        '    newname = getNewName(node.Parent, newname)
-        '    'If TreeView1.Nodes(newname) IsNot Nothing Then MsgBox("Note with this name already exist in the same level of the tree") : Exit Sub
-        'Else
-        '    newname = getNewName(node.Parent, newname)
-        '    'If node.Parent.Nodes(newName) IsNot Nothing Then MsgBox("Note with this name already exist in the same level of the tree") : Exit Sub
-        'End If
 
         Dim old_path = SAVE_PATH + "\" + node.FullPath
         node.Name = newname
