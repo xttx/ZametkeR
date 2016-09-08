@@ -122,7 +122,7 @@ Public Class Form1
         If DirectoryExists(SAVE_PATH) Then load_recursively()
         If Not CheckBox2.Checked Then TreeView1.ImageList = Nothing
         Dim d = DateTime.Now - loading_start
-        Label5.Text = "ZametkeR was loaded this time in " + d.Seconds.ToString + "." + d.Milliseconds.ToString + " seconds"
+        Label5.Text = "ZametkeR was loaded in " + d.Seconds.ToString + "." + d.Milliseconds.ToString + " seconds"
     End Sub
     Private Sub Form1_Closing(sender As Object, e As CancelEventArgs) Handles Me.Closing
         If AutosaveOnExitToolStripMenuItem.Checked Then ToolStripButton1_Click(ToolStripButton1, New EventArgs)
@@ -362,7 +362,7 @@ Public Class Form1
         End If
     End Sub
 
-    'Shortcuts
+    'Hotkeys
     Private Sub Form1_KeyDown(sender As Object, e As KeyEventArgs) Handles Me.KeyDown
         If e.Alt And Not e.Control And e.KeyCode = Keys.A Then ToolStripButton2_Click(ToolStripButton2, New EventArgs)
         If e.Control And e.Alt And e.KeyCode = Keys.A Then ToolStripButton3_Click(ToolStripButton3, New EventArgs)
@@ -1947,7 +1947,8 @@ Public Class Form1
         draggedNode = DirectCast(e.Item, TreeNode)
 
         Dim DataObject As New DataObject
-        Dim file = (SAVE_PATH + "\" + draggedNode.FullPath + ".zam").Replace("\\", "\")
+        'Dim file = (SAVE_PATH + "\" + draggedNode.FullPath + ".zam").Replace("\\", "\")
+        Dim file = Path.Combine(Application.StartupPath, SAVE_PATH + "\" + draggedNode.FullPath + ".zam")
         If FileExists(file) Then DataObject.SetData(DataFormats.FileDrop, True, {file})
         TreeView1.DoDragDrop(DataObject, DragDropEffects.Copy)
     End Sub

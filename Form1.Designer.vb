@@ -257,7 +257,7 @@ Partial Class Form1
         Me.GroupBox2.Controls.Add(Me.RadioButton11)
         Me.GroupBox2.Controls.Add(Me.RadioButton10)
         Me.GroupBox2.Controls.Add(Me.RadioButton9)
-        Me.GroupBox2.Location = New System.Drawing.Point(303, 155)
+        Me.GroupBox2.Location = New System.Drawing.Point(394, 155)
         Me.GroupBox2.Name = "GroupBox2"
         Me.GroupBox2.Size = New System.Drawing.Size(125, 128)
         Me.GroupBox2.TabIndex = 14
@@ -312,7 +312,7 @@ Partial Class Form1
         Me.GroupBox1.Controls.Add(Me.RadioButton8)
         Me.GroupBox1.Controls.Add(Me.RadioButton7)
         Me.GroupBox1.Controls.Add(Me.RadioButton6)
-        Me.GroupBox1.Location = New System.Drawing.Point(172, 155)
+        Me.GroupBox1.Location = New System.Drawing.Point(263, 155)
         Me.GroupBox1.Name = "GroupBox1"
         Me.GroupBox1.Size = New System.Drawing.Size(125, 128)
         Me.GroupBox1.TabIndex = 13
@@ -390,7 +390,7 @@ Partial Class Form1
         'Label5
         '
         Me.Label5.AutoSize = True
-        Me.Label5.Location = New System.Drawing.Point(13, 270)
+        Me.Label5.Location = New System.Drawing.Point(16, 267)
         Me.Label5.Name = "Label5"
         Me.Label5.Size = New System.Drawing.Size(39, 13)
         Me.Label5.TabIndex = 10
