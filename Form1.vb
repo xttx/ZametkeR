@@ -505,27 +505,24 @@ Public Class Form1
             content_associatedNodes(rtf) = node
         End If
 
-        'rtf.SelectionColor = Color.Black 'Ne pmnu zachem eto
-
         If content(node).Contains("{%%%UNLOADED%%%") Then
             Dim f = SAVE_PATH + "\" + node.FullPath + ".zam"
-            If FileExists(f) Then content(node) = load_content(f, node) ': load_bcg(f, node)
-        End If
-        If content(node).ToUpper.StartsWith("{\RTF") Then
-            rtf.Rtf = content(node)
-        Else
-            rtf.Text = content(node)
+            If FileExists(f) Then content(node) = load_content(f, node)
         End If
 
         'If content is empty, set default font size
-        If rtf.Text.Trim = "" Then
+        If content(node).Trim = "" Or Not content(node).ToUpper.StartsWith("{\RTF") Then
             Dim f = rtf.Font
-            'Dim f = rtf.SelectionFont
-            'rtf.SelectAll()
             rtf.Font = New Font(f.FontFamily, CSng(ComboBox1.SelectedItem.ToString), f.Style)
             rtf.SelectionFont = New Font(f.FontFamily, CSng(ComboBox1.SelectedItem.ToString), f.Style)
             'Update toolbar controls. MAYBE THIS NEED TO BE MOVED OUT OF IF TO UPDATE CONTROLS UNCONDITIONALLY
             rtf_SelectionChanged(rtf, New EventArgs)
+        End If
+
+        If content(node).ToUpper.StartsWith("{\RTF") Then
+            rtf.Rtf = content(node)
+        Else
+            rtf.Text = content(node)
         End If
 
         If content_bgcolor.ContainsKey(node) Then rtf.BackColor = content_bgcolor(node) Else rtf.BackColor = Color.White
@@ -562,14 +559,7 @@ Public Class Form1
         If words.Count > 1 Then newname = words(0) + " " + words(1)
 
         'add page
-        ToolStripButton2_Click(ToolStripButton2, New EventArgs, newname)
-
-        'Set content
-        content(TreeView1.SelectedNode) = Clipboard.GetText.Trim
-        openNote(TreeView1.SelectedNode)
-
-        'renaming
-        'ToolStripButton20_rename_sub(newname)
+        ToolStripButton2_Click(ToolStripButton2, New EventArgs, newname, Clipboard.GetText.Trim)
     End Sub
 
     'Change rtf text
@@ -707,7 +697,7 @@ Public Class Form1
 
 
     'Add page
-    Private Sub ToolStripButton2_Click(sender As Object, e As EventArgs, Optional new_name As String = "") Handles ToolStripButton2.Click
+    Private Sub ToolStripButton2_Click(sender As Object, e As EventArgs, Optional new_name As String = "", Optional _content As String = "") Handles ToolStripButton2.Click
         Dim c As Integer = 0
         Dim node_main As TreeNode = nodeForContextMenu2
         If node_main Is Nothing Then node_main = TreeView1.SelectedNode
@@ -729,9 +719,16 @@ Public Class Form1
                 node = tmp.Nodes.Add(default_text, default_text)
             End If
         End If
-        content.Add(node, "")
+        content.Add(node, _content)
         TreeView1.SelectedNode = node
-        If CheckBox1.Checked Then ToolStripButton20_Click(ToolStripButton20, New EventArgs)
+
+        'rename if needed
+        If CheckBox1.Checked Then
+            If ToolStripButton20_Click(ToolStripButton20, New EventArgs) = "" Then
+                'delete if renaming canceled
+                ToolStripButton4_Click(ToolStripButton4, New EventArgs)
+            End If
+        End If
     End Sub
     'Add page hierarchy
     Private Sub ToolStripButton3_Click(sender As Object, e As EventArgs) Handles ToolStripButton3.Click
@@ -743,19 +740,20 @@ Public Class Form1
 
         Dim c As Integer = 0
         Dim default_text = "New Page"
-        'Dim default_textE = "New Page"
-        'Do While TreeView1.SelectedNode.Nodes(default_textE) IsNot Nothing
-        '    c += 1
-        '    default_textE = default_text + " (" + c.ToString + ")"
-        'Loop
-        'Dim node = TreeView1.SelectedNode.Nodes.Add(default_textE, default_textE)
         default_text = getNewName(node_main, default_text, True)
         Dim node = node_main.Nodes.Add(default_text, default_text)
 
         node_main.Expand()
         content.Add(node, "")
         TreeView1.SelectedNode = node
-        If CheckBox1.Checked Then ToolStripButton20_Click(ToolStripButton20, New EventArgs)
+
+        'rename if needed
+        If CheckBox1.Checked Then
+            If ToolStripButton20_Click(ToolStripButton20, New EventArgs) = "" Then
+                'delete if renaming canceled
+                ToolStripButton4_Click(ToolStripButton4, New EventArgs)
+            End If
+        End If
     End Sub
     'Remove page
     Private Sub ToolStripButton4_Click(sender As Object, e As EventArgs) Handles ToolStripButton4.Click
@@ -800,14 +798,14 @@ Public Class Form1
         content.Remove(node)
     End Sub
     'Rename page
-    Private Sub ToolStripButton20_Click(sender As Object, e As EventArgs) Handles ToolStripButton20.Click
-        ToolStripButton20_rename_sub()
-    End Sub
-    Private Sub ToolStripButton20_rename_sub(Optional newname As String = "")
+    Private Function ToolStripButton20_Click(sender As Object, e As EventArgs) As String Handles ToolStripButton20.Click
+        Return ToolStripButton20_rename_sub()
+    End Function
+    Private Function ToolStripButton20_rename_sub(Optional newname As String = "") As String
         Dim node_main As TreeNode = nodeForContextMenu2
         If node_main Is Nothing Then node_main = TreeView1.SelectedNode
 
-        If node_main Is Nothing Then MsgBox("You must select a page to rename") : Exit Sub
+        If node_main Is Nothing Then MsgBox("You must select a page to rename") : Return ""
         Dim node = node_main
 
         Dim nameIsEntered As Boolean = False
@@ -816,15 +814,22 @@ Public Class Form1
         Do While newname.Contains("/") Or newname.Contains("\") Or newname.Contains(":") Or newname.Contains("*") Or newname.Contains("?") Or newname.Contains("""") Or newname.Contains("<") Or newname.Contains(">") Or newname.Contains("|")
             newname = InputBox("Name contains illegal character (/, \, :, *, ?, """", >, <, |). Choose another name.", "Renaming page", node.Text).Trim : nameIsEntered = True
         Loop
-        If newname = "" Then Exit Sub
+        If newname = "" Then Return ""
 
         If Not newname = node.Text Then newname = getNewName(node, newname)
 
         Dim old_path = SAVE_PATH + "\" + node.FullPath
         node.Name = newname
         node.Text = newname
-        If FileExists(old_path + ".zam") Then MoveFile(old_path + ".zam", SAVE_PATH + "\" + node.FullPath + ".zam")
+        If Not Path.GetFullPath(old_path).ToUpper = Path.GetFullPath(SAVE_PATH + "\" + node.FullPath).ToUpper Then
+            If DirectoryExists(Path.GetDirectoryName(old_path)) Then
+                For Each file In GetFiles(Path.GetDirectoryName(old_path), FileIO.SearchOption.SearchTopLevelOnly, {Path.GetFileName(old_path) + ".*"})
+                    MoveFile(file, SAVE_PATH + "\" + node.FullPath + Path.GetExtension(file))
+                Next
+            End If
+        End If
         If DirectoryExists(old_path) Then RenameDirectory(old_path, node.Text)
+
         For Each tabPage As TabPage In TabControl1.TabPages
             If tabPage.Text = "Options" Then Continue For
             Dim rtf = tabPage.Controls.OfType(Of RichTextBox).First
@@ -845,7 +850,8 @@ Public Class Form1
                 End If
             End If
         End If
-    End Sub
+        Return "OK"
+    End Function
     'Duplicate page
     Private Sub ToolStripButton21_Click(sender As Object, e As EventArgs) Handles ToolStripButton21.Click
         Dim node_main As TreeNode = nodeForContextMenu2
@@ -918,14 +924,13 @@ Public Class Form1
         nodes.Insert(ind, node)
         TreeView1.SelectedNode = node
     End Sub
-    'CheckAvailName
+    'getNewName - CheckAvailName
     Private Function getNewName(node As TreeNode, name As String, Optional checkInsideNode As Boolean = False)
         Dim c As Integer = 0
         Dim new_name As String = name
 
         If Not checkInsideNode Then
             If node Is Nothing OrElse node.Parent Is Nothing Then
-
                 Do While TreeView1.Nodes(new_name) IsNot Nothing
                     c += 1
                     new_name = name + " (" + c.ToString + ")"
@@ -1943,7 +1948,6 @@ Public Class Form1
         draggedNode = DirectCast(e.Item, TreeNode)
 
         Dim DataObject As New DataObject
-        'Dim file = (SAVE_PATH + "\" + draggedNode.FullPath + ".zam").Replace("\\", "\")
         Dim file = Path.Combine(Application.StartupPath, SAVE_PATH + "\" + draggedNode.FullPath + ".zam")
         If FileExists(file) Then DataObject.SetData(DataFormats.FileDrop, True, {file})
         TreeView1.DoDragDrop(DataObject, DragDropEffects.Copy)
@@ -1959,18 +1963,38 @@ Public Class Form1
         If draggedNode IsNot Nothing Then
             Dim pt As Point = TreeView1.PointToClient(New Point(e.X, e.Y))
             Dim DestinationNode As TreeNode = TreeView1.GetNodeAt(pt)
-            Dim NewNode As TreeNode = draggedNode
+
+            Dim old_path = SAVE_PATH + "\" + draggedNode.FullPath
+            Dim new_name As String
 
             If DestinationNode IsNot Nothing Then
-                If Not DestinationNode Is NewNode Then
-                    NewNode.Remove()
-                    DestinationNode.Nodes.Add(NewNode)
+                If Not DestinationNode Is draggedNode Then
+                    draggedNode.Remove()
+                    new_name = getNewName(DestinationNode, draggedNode.Text, True)
+
+                    DestinationNode.Nodes.Add(draggedNode)
                     DestinationNode.Expand()
+                Else
+                    Exit Sub
                 End If
             Else
-                NewNode.Remove()
-                TreeView1.Nodes.Add(NewNode)
+                draggedNode.Remove()
+                new_name = getNewName(Nothing, draggedNode.Text)
+
+                TreeView1.Nodes.Add(draggedNode)
             End If
+            draggedNode.Name = new_name
+            draggedNode.Text = new_name
+
+            If Not Path.GetFullPath(old_path).ToUpper = Path.GetFullPath(SAVE_PATH + "\" + draggedNode.FullPath).ToUpper Then
+                If DirectoryExists(Path.GetDirectoryName(old_path)) Then
+                    For Each file In GetFiles(Path.GetDirectoryName(old_path), FileIO.SearchOption.SearchTopLevelOnly, {Path.GetFileName(old_path) + ".*"})
+                        MoveFile(file, SAVE_PATH + "\" + draggedNode.FullPath + Path.GetExtension(file))
+                    Next
+                End If
+            End If
+            If DirectoryExists(old_path) Then MoveDirectory(old_path, SAVE_PATH + "\" + draggedNode.FullPath)
+
             draggedNode = Nothing
         End If
     End Sub
