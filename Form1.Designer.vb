@@ -26,6 +26,8 @@ Partial Class Form1
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(Form1))
         Me.TabControl1 = New System.Windows.Forms.TabControl()
         Me.TabPageOptions = New System.Windows.Forms.TabPage()
+        Me.Label7 = New System.Windows.Forms.Label()
+        Me.CheckBox9 = New System.Windows.Forms.CheckBox()
         Me.CheckBox8 = New System.Windows.Forms.CheckBox()
         Me.CheckBox7 = New System.Windows.Forms.CheckBox()
         Me.GroupBox2 = New System.Windows.Forms.GroupBox()
@@ -166,12 +168,17 @@ Partial Class Form1
         Me.RenameToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.DeleteToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.CopyAsFileToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripMenuItem17 = New System.Windows.Forms.ToolStripSeparator()
+        Me.SortChildrensToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripMenuItem2 = New System.Windows.Forms.ToolStripSeparator()
         Me.SetNoteForeColorToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.SetNoteBackColorToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.SetCustomIconToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripMenuItem3 = New System.Windows.Forms.ToolStripSeparator()
         Me.PastAsNewNoteToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.BackupsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.CreateNowToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripMenuItem18 = New System.Windows.Forms.ToolStripSeparator()
         Me.TabControl1.SuspendLayout()
         Me.TabPageOptions.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
@@ -197,13 +204,15 @@ Partial Class Form1
         Me.TabControl1.Location = New System.Drawing.Point(0, 0)
         Me.TabControl1.Name = "TabControl1"
         Me.TabControl1.SelectedIndex = 0
-        Me.TabControl1.Size = New System.Drawing.Size(580, 327)
+        Me.TabControl1.Size = New System.Drawing.Size(580, 353)
         Me.TabControl1.SizeMode = System.Windows.Forms.TabSizeMode.Fixed
         Me.TabControl1.TabIndex = 0
         '
         'TabPageOptions
         '
         Me.TabPageOptions.BackColor = System.Drawing.Color.PaleGreen
+        Me.TabPageOptions.Controls.Add(Me.Label7)
+        Me.TabPageOptions.Controls.Add(Me.CheckBox9)
         Me.TabPageOptions.Controls.Add(Me.CheckBox8)
         Me.TabPageOptions.Controls.Add(Me.CheckBox7)
         Me.TabPageOptions.Controls.Add(Me.GroupBox2)
@@ -223,15 +232,35 @@ Partial Class Form1
         Me.TabPageOptions.Controls.Add(Me.Label1)
         Me.TabPageOptions.Location = New System.Drawing.Point(4, 22)
         Me.TabPageOptions.Name = "TabPageOptions"
-        Me.TabPageOptions.Size = New System.Drawing.Size(572, 301)
+        Me.TabPageOptions.Size = New System.Drawing.Size(572, 327)
         Me.TabPageOptions.TabIndex = 0
         Me.TabPageOptions.Text = "Options"
+        '
+        'Label7
+        '
+        Me.Label7.AutoSize = True
+        Me.Label7.Location = New System.Drawing.Point(13, 300)
+        Me.Label7.Name = "Label7"
+        Me.Label7.Size = New System.Drawing.Size(167, 13)
+        Me.Label7.TabIndex = 18
+        Me.Label7.Text = "Last save time: NOT YET SAVED"
+        '
+        'CheckBox9
+        '
+        Me.CheckBox9.AutoSize = True
+        Me.CheckBox9.CheckAlign = System.Drawing.ContentAlignment.MiddleRight
+        Me.CheckBox9.Location = New System.Drawing.Point(123, 250)
+        Me.CheckBox9.Name = "CheckBox9"
+        Me.CheckBox9.Size = New System.Drawing.Size(131, 17)
+        Me.CheckBox9.TabIndex = 17
+        Me.CheckBox9.Text = "Focus rtf on tree click:"
+        Me.CheckBox9.UseVisualStyleBackColor = True
         '
         'CheckBox8
         '
         Me.CheckBox8.AutoSize = True
         Me.CheckBox8.CheckAlign = System.Drawing.ContentAlignment.MiddleRight
-        Me.CheckBox8.Location = New System.Drawing.Point(16, 247)
+        Me.CheckBox8.Location = New System.Drawing.Point(13, 250)
         Me.CheckBox8.Name = "CheckBox8"
         Me.CheckBox8.Size = New System.Drawing.Size(87, 17)
         Me.CheckBox8.TabIndex = 16
@@ -244,7 +273,7 @@ Partial Class Form1
         Me.CheckBox7.CheckAlign = System.Drawing.ContentAlignment.MiddleRight
         Me.CheckBox7.Checked = True
         Me.CheckBox7.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.CheckBox7.Location = New System.Drawing.Point(16, 224)
+        Me.CheckBox7.Location = New System.Drawing.Point(13, 225)
         Me.CheckBox7.Name = "CheckBox7"
         Me.CheckBox7.Size = New System.Drawing.Size(111, 17)
         Me.CheckBox7.TabIndex = 15
@@ -369,7 +398,7 @@ Partial Class Form1
         Me.CheckBox4.CheckAlign = System.Drawing.ContentAlignment.MiddleRight
         Me.CheckBox4.Checked = True
         Me.CheckBox4.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.CheckBox4.Location = New System.Drawing.Point(16, 201)
+        Me.CheckBox4.Location = New System.Drawing.Point(13, 200)
         Me.CheckBox4.Name = "CheckBox4"
         Me.CheckBox4.Size = New System.Drawing.Size(120, 17)
         Me.CheckBox4.TabIndex = 12
@@ -380,7 +409,7 @@ Partial Class Form1
         '
         Me.CheckBox3.AutoSize = True
         Me.CheckBox3.CheckAlign = System.Drawing.ContentAlignment.MiddleRight
-        Me.CheckBox3.Location = New System.Drawing.Point(16, 178)
+        Me.CheckBox3.Location = New System.Drawing.Point(13, 175)
         Me.CheckBox3.Name = "CheckBox3"
         Me.CheckBox3.Size = New System.Drawing.Size(137, 17)
         Me.CheckBox3.TabIndex = 11
@@ -390,7 +419,7 @@ Partial Class Form1
         'Label5
         '
         Me.Label5.AutoSize = True
-        Me.Label5.Location = New System.Drawing.Point(16, 267)
+        Me.Label5.Location = New System.Drawing.Point(13, 275)
         Me.Label5.Name = "Label5"
         Me.Label5.Size = New System.Drawing.Size(39, 13)
         Me.Label5.TabIndex = 10
@@ -400,7 +429,7 @@ Partial Class Form1
         '
         Me.CheckBox2.AutoSize = True
         Me.CheckBox2.CheckAlign = System.Drawing.ContentAlignment.MiddleRight
-        Me.CheckBox2.Location = New System.Drawing.Point(16, 155)
+        Me.CheckBox2.Location = New System.Drawing.Point(13, 150)
         Me.CheckBox2.Name = "CheckBox2"
         Me.CheckBox2.Size = New System.Drawing.Size(84, 17)
         Me.CheckBox2.TabIndex = 9
@@ -409,7 +438,7 @@ Partial Class Form1
         '
         'TextBox1
         '
-        Me.TextBox1.Location = New System.Drawing.Point(172, 21)
+        Me.TextBox1.Location = New System.Drawing.Point(172, 22)
         Me.TextBox1.Name = "TextBox1"
         Me.TextBox1.Size = New System.Drawing.Size(156, 20)
         Me.TextBox1.TabIndex = 8
@@ -418,7 +447,7 @@ Partial Class Form1
         'Label4
         '
         Me.Label4.AutoSize = True
-        Me.Label4.Location = New System.Drawing.Point(13, 24)
+        Me.Label4.Location = New System.Drawing.Point(13, 25)
         Me.Label4.Name = "Label4"
         Me.Label4.Size = New System.Drawing.Size(62, 13)
         Me.Label4.TabIndex = 7
@@ -430,7 +459,7 @@ Partial Class Form1
         Me.Panel2.Controls.Add(Me.RadioButton4)
         Me.Panel2.Controls.Add(Me.RadioButton3)
         Me.Panel2.Controls.Add(Me.Label3)
-        Me.Panel2.Location = New System.Drawing.Point(16, 128)
+        Me.Panel2.Location = New System.Drawing.Point(13, 125)
         Me.Panel2.Name = "Panel2"
         Me.Panel2.Size = New System.Drawing.Size(539, 21)
         Me.Panel2.TabIndex = 6
@@ -480,7 +509,7 @@ Partial Class Form1
         '
         Me.CheckBox1.AutoSize = True
         Me.CheckBox1.CheckAlign = System.Drawing.ContentAlignment.MiddleRight
-        Me.CheckBox1.Location = New System.Drawing.Point(16, 102)
+        Me.CheckBox1.Location = New System.Drawing.Point(13, 100)
         Me.CheckBox1.Name = "CheckBox1"
         Me.CheckBox1.Size = New System.Drawing.Size(182, 17)
         Me.CheckBox1.TabIndex = 5
@@ -500,7 +529,7 @@ Partial Class Form1
         'Label2
         '
         Me.Label2.AutoSize = True
-        Me.Label2.Location = New System.Drawing.Point(13, 78)
+        Me.Label2.Location = New System.Drawing.Point(13, 75)
         Me.Label2.Name = "Label2"
         Me.Label2.Size = New System.Drawing.Size(153, 13)
         Me.Label2.TabIndex = 3
@@ -531,7 +560,7 @@ Partial Class Form1
         'Label1
         '
         Me.Label1.AutoSize = True
-        Me.Label1.Location = New System.Drawing.Point(13, 53)
+        Me.Label1.Location = New System.Drawing.Point(13, 50)
         Me.Label1.Name = "Label1"
         Me.Label1.Size = New System.Drawing.Size(73, 13)
         Me.Label1.TabIndex = 0
@@ -671,7 +700,7 @@ Partial Class Form1
         '
         'OptionsToolStripMenuItem
         '
-        Me.OptionsToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.EncryptContentToolStripMenuItem, Me.AutosaveOnExitToolStripMenuItem, Me.RememberLastPositionAndSizeToolStripMenuItem, Me.TrayToolStripMenuItem})
+        Me.OptionsToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.EncryptContentToolStripMenuItem, Me.AutosaveOnExitToolStripMenuItem, Me.RememberLastPositionAndSizeToolStripMenuItem, Me.TrayToolStripMenuItem, Me.BackupsToolStripMenuItem})
         Me.OptionsToolStripMenuItem.Name = "OptionsToolStripMenuItem"
         Me.OptionsToolStripMenuItem.Size = New System.Drawing.Size(61, 20)
         Me.OptionsToolStripMenuItem.Text = "Options"
@@ -1002,7 +1031,7 @@ Partial Class Form1
         'SplitContainer1.Panel2
         '
         Me.SplitContainer1.Panel2.Controls.Add(Me.TabControl1)
-        Me.SplitContainer1.Size = New System.Drawing.Size(837, 327)
+        Me.SplitContainer1.Size = New System.Drawing.Size(837, 353)
         Me.SplitContainer1.SplitterDistance = 253
         Me.SplitContainer1.TabIndex = 3
         '
@@ -1278,7 +1307,7 @@ Partial Class Form1
         '
         Me.ToolStrip2.Dock = System.Windows.Forms.DockStyle.Bottom
         Me.ToolStrip2.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripButton2, Me.ToolStripButton3, Me.ToolStripButton21, Me.ToolStripSeparator1, Me.ToolStripButton4, Me.ToolStripButton20, Me.ToolStripSeparator8, Me.ToolStripButton23, Me.ToolStripButton24, Me.ToolStripButton28})
-        Me.ToolStrip2.Location = New System.Drawing.Point(0, 302)
+        Me.ToolStrip2.Location = New System.Drawing.Point(0, 328)
         Me.ToolStrip2.Name = "ToolStrip2"
         Me.ToolStrip2.Size = New System.Drawing.Size(253, 25)
         Me.ToolStrip2.TabIndex = 1
@@ -1387,7 +1416,7 @@ Partial Class Form1
         Me.TreeView1.Location = New System.Drawing.Point(0, 0)
         Me.TreeView1.Name = "TreeView1"
         Me.TreeView1.SelectedImageIndex = 3
-        Me.TreeView1.Size = New System.Drawing.Size(253, 305)
+        Me.TreeView1.Size = New System.Drawing.Size(253, 331)
         Me.TreeView1.TabIndex = 0
         '
         'ImageList1
@@ -1401,9 +1430,9 @@ Partial Class Form1
         '
         'ContextMenuStrip1
         '
-        Me.ContextMenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.OpenInNewTabToolStripMenuItem, Me.OpenAllChildrenToolStripMenuItem, Me.ToolStripMenuItem4, Me.AddToolStripMenuItem, Me.AddChildToolStripMenuItem, Me.CloneToolStripMenuItem, Me.RenameToolStripMenuItem, Me.DeleteToolStripMenuItem, Me.CopyAsFileToolStripMenuItem, Me.ToolStripMenuItem2, Me.SetNoteForeColorToolStripMenuItem, Me.SetNoteBackColorToolStripMenuItem, Me.SetCustomIconToolStripMenuItem, Me.ToolStripMenuItem3, Me.PastAsNewNoteToolStripMenuItem})
+        Me.ContextMenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.OpenInNewTabToolStripMenuItem, Me.OpenAllChildrenToolStripMenuItem, Me.ToolStripMenuItem4, Me.AddToolStripMenuItem, Me.AddChildToolStripMenuItem, Me.CloneToolStripMenuItem, Me.RenameToolStripMenuItem, Me.DeleteToolStripMenuItem, Me.CopyAsFileToolStripMenuItem, Me.ToolStripMenuItem17, Me.SortChildrensToolStripMenuItem, Me.ToolStripMenuItem2, Me.SetNoteForeColorToolStripMenuItem, Me.SetNoteBackColorToolStripMenuItem, Me.SetCustomIconToolStripMenuItem, Me.ToolStripMenuItem3, Me.PastAsNewNoteToolStripMenuItem})
         Me.ContextMenuStrip1.Name = "ContextMenuStrip1"
-        Me.ContextMenuStrip1.Size = New System.Drawing.Size(177, 286)
+        Me.ContextMenuStrip1.Size = New System.Drawing.Size(177, 314)
         '
         'OpenInNewTabToolStripMenuItem
         '
@@ -1458,6 +1487,17 @@ Partial Class Form1
         Me.CopyAsFileToolStripMenuItem.Size = New System.Drawing.Size(176, 22)
         Me.CopyAsFileToolStripMenuItem.Text = "Copy as File"
         '
+        'ToolStripMenuItem17
+        '
+        Me.ToolStripMenuItem17.Name = "ToolStripMenuItem17"
+        Me.ToolStripMenuItem17.Size = New System.Drawing.Size(173, 6)
+        '
+        'SortChildrensToolStripMenuItem
+        '
+        Me.SortChildrensToolStripMenuItem.Name = "SortChildrensToolStripMenuItem"
+        Me.SortChildrensToolStripMenuItem.Size = New System.Drawing.Size(176, 22)
+        Me.SortChildrensToolStripMenuItem.Text = "Sort Childrens"
+        '
         'ToolStripMenuItem2
         '
         Me.ToolStripMenuItem2.Name = "ToolStripMenuItem2"
@@ -1492,11 +1532,29 @@ Partial Class Form1
         Me.PastAsNewNoteToolStripMenuItem.Size = New System.Drawing.Size(176, 22)
         Me.PastAsNewNoteToolStripMenuItem.Text = "Past as new note"
         '
+        'BackupsToolStripMenuItem
+        '
+        Me.BackupsToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.CreateNowToolStripMenuItem, Me.ToolStripMenuItem18})
+        Me.BackupsToolStripMenuItem.Name = "BackupsToolStripMenuItem"
+        Me.BackupsToolStripMenuItem.Size = New System.Drawing.Size(244, 22)
+        Me.BackupsToolStripMenuItem.Text = "Backups"
+        '
+        'CreateNowToolStripMenuItem
+        '
+        Me.CreateNowToolStripMenuItem.Name = "CreateNowToolStripMenuItem"
+        Me.CreateNowToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
+        Me.CreateNowToolStripMenuItem.Text = "Create Now"
+        '
+        'ToolStripMenuItem18
+        '
+        Me.ToolStripMenuItem18.Name = "ToolStripMenuItem18"
+        Me.ToolStripMenuItem18.Size = New System.Drawing.Size(149, 6)
+        '
         'Form1
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(837, 376)
+        Me.ClientSize = New System.Drawing.Size(837, 402)
         Me.Controls.Add(Me.SplitContainer1)
         Me.Controls.Add(Me.ToolStrip1)
         Me.Controls.Add(Me.MenuStrip1)
@@ -1680,4 +1738,11 @@ Partial Class Form1
     Friend WithEvents CheckBox7 As CheckBox
     Friend WithEvents CopyAsFileToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents CheckBox8 As CheckBox
+    Friend WithEvents CheckBox9 As CheckBox
+    Friend WithEvents Label7 As Label
+    Friend WithEvents ToolStripMenuItem17 As ToolStripSeparator
+    Friend WithEvents SortChildrensToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents BackupsToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents CreateNowToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents ToolStripMenuItem18 As ToolStripSeparator
 End Class

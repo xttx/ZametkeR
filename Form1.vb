@@ -23,6 +23,7 @@ Public Class Form1
     Dim remindersAstralisText As String = ""
     Dim SAVE_PATH_START As String = ""
     Dim colorArray = {"Red", "Blue", "Green", "Yellow", "Orange", "White", "Black", "Aqua", "Magenta", "Custom ..."}
+    Dim focusRtfNextTime As RichTextBox = Nothing
 
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         refr = True
@@ -118,11 +119,23 @@ Public Class Form1
         t = ini.IniReadValue("Main", "HotTrack")
         If t <> "0" And t.ToUpper <> "FALSE" And t <> "" Then CheckBox8.Checked = True
 
+        t = ini.IniReadValue("Main", "Focus_RTF_on_tree_click")
+        If t <> "0" And t.ToUpper <> "FALSE" And t <> "" Then CheckBox9.Checked = True
+
         refr = False
         If DirectoryExists(SAVE_PATH) Then load_recursively()
         If Not CheckBox2.Checked Then TreeView1.ImageList = Nothing
+
+        'Add backups menu items
+        If DirectoryExists(SAVE_PATH + "\!!!Backups") Then
+            For Each f In GetDirectories(SAVE_PATH + "\!!!Backups")
+                BackupsToolStripMenuItem.DropDownItems.Add(f.Substring(f.LastIndexOf("\") + 1))
+            Next
+        End If
+
         Dim d = DateTime.Now - loading_start
-        Label5.Text = "ZametkeR was loaded in " + d.Seconds.ToString + "." + d.Milliseconds.ToString + " seconds"
+        'Label5.Text = "ZametkeR was loaded in " + d.Seconds.ToString + "." + d.Milliseconds.ToString + " seconds"
+        Label5.Text = "ZametkeR was loaded in " + Math.Round(d.TotalSeconds, 3).ToString + " seconds"
     End Sub
     Private Sub Form1_Closing(sender As Object, e As CancelEventArgs) Handles Me.Closing
         If AutosaveOnExitToolStripMenuItem.Checked Then ToolStripButton1_Click(ToolStripButton1, New EventArgs)
@@ -148,6 +161,9 @@ Public Class Form1
         If Not dir_root.EndsWith("\") Then dir_root = dir_root + "\"
 
         Dim files = GetFiles(SAVE_PATH, FileIO.SearchOption.SearchAllSubDirectories, {"*.zam"}).ToList
+        For i As Integer = files.Count - 1 To 0 Step -1
+            If files(i).ToUpper.Contains("!!!BACKUPS") Then files.RemoveAt(i)
+        Next
         If RadioButton3.Checked Or RadioButton4.Checked Then files.Sort()
 
         'ORDER
@@ -383,6 +399,7 @@ Public Class Form1
     Private Sub TreeView1_NodeMouseClick(sender As Object, e As TreeNodeMouseClickEventArgs) Handles TreeView1.NodeMouseClick
         If TreeView1.SelectedNode Is Nothing Then Exit Sub
         If e.Button = MouseButtons.Left Then
+            If e.Node IsNot TreeView1.SelectedNode AndAlso CheckBox9.Checked Then focusRtfNextTime = New RichTextBox
             If e.Node Is TreeView1.SelectedNode Then TreeView1_AfterSelect(TreeView1, New TreeViewEventArgs(e.Node))
         ElseIf e.Button = MouseButtons.Right Then
             If Clipboard.GetText.Trim = "" Then
@@ -416,6 +433,7 @@ Public Class Form1
             ToolStripButton20_Click(ToolStripButton20, New EventArgs)
         End If
     End Sub
+    'Hotkeys on treeview
     Private Sub TreeView1_KeyDown(sender As Object, e As KeyEventArgs) Handles TreeView1.KeyDown
         If e.Control And e.KeyCode = Keys.V Then
             pastAsNewNote()
@@ -427,6 +445,13 @@ Public Class Form1
             ToolStripButton4_Click(ToolStripButton4, New EventArgs)
             TreeView1.Select()
         End If
+        If e.KeyCode = Keys.F2 And TreeView1.SelectedNode IsNot Nothing Then
+            ToolStripButton20_Click(ToolStripButton20, New EventArgs)
+        End If
+    End Sub
+    'Tree got focus
+    Sub TreeView1_Enter() Handles TreeView1.Enter
+        If focusRtfNextTime IsNot Nothing Then focusRtfNextTime.Select() : focusRtfNextTime = Nothing
     End Sub
     'Hot track
     Private Sub TreeView1_MouseEnter(sender As Object, e As EventArgs) Handles TreeView1.MouseEnter
@@ -441,10 +466,18 @@ Public Class Form1
         Dim firstNoServiceTab As Integer = -1
         Dim lastNoServiceTab As Integer = -1
 
-        'Check if this note already opened
+        'set first and last noService tabs and Check if this note already opened
         For Each tabpage In TabControl1.TabPages
-            If tabpage.Text = node.Text Then TabControl1.SelectedTab = tabpage : refr = False : Exit Sub
+            'If tabpage.Text = node.Text Then TabControl1.SelectedTab = tabpage : refr = False : Exit Sub
             If tabpage IsNot optionsTabPage And tabpage.Text.ToUpper <> "SEARCH" Then
+                'Check if this note already opened
+                rtf = tabpage.Controls.OfType(Of RichTextBox).First
+                If content_associatedNodes.ContainsKey(rtf) AndAlso content_associatedNodes(rtf) Is node Then
+                    TabControl1.SelectedTab = tabpage
+                    If focusRtfNextTime IsNot Nothing Then rtf.Select() : focusRtfNextTime = rtf
+                    refr = False : Exit Sub
+                End If
+
                 If firstNoServiceTab = -1 Then firstNoServiceTab = TabControl1.TabPages.IndexOf(tabpage)
                 lastNoServiceTab = TabControl1.TabPages.IndexOf(tabpage)
             End If
@@ -534,7 +567,8 @@ Public Class Form1
         'handle encrypt button
         TabControl1_SelectedIndexChanged(TabControl1, New EventArgs)
 
-        rtf.Select()
+        'rtf to select
+        If focusRtfNextTime IsNot Nothing Then rtf.Select() : focusRtfNextTime = rtf
         refr = False
     End Sub
     Private Function openNote_insert(tabpage As TabPage, node As TreeNode) As RichTextBox
@@ -816,19 +850,21 @@ Public Class Form1
         Loop
         If newname = "" Then Return ""
 
-        If Not newname = node.Text Then newname = getNewName(node, newname)
+        If newname.ToUpper <> node.Text.ToUpper Then
+            newname = getNewName(node, newname)
 
-        Dim old_path = SAVE_PATH + "\" + node.FullPath
-        node.Name = newname
-        node.Text = newname
-        If Not Path.GetFullPath(old_path).ToUpper = Path.GetFullPath(SAVE_PATH + "\" + node.FullPath).ToUpper Then
-            If DirectoryExists(Path.GetDirectoryName(old_path)) Then
-                For Each file In GetFiles(Path.GetDirectoryName(old_path), FileIO.SearchOption.SearchTopLevelOnly, {Path.GetFileName(old_path) + ".*"})
-                    MoveFile(file, SAVE_PATH + "\" + node.FullPath + Path.GetExtension(file))
-                Next
+            Dim old_path = SAVE_PATH + "\" + node.FullPath
+            node.Name = newname
+            node.Text = newname
+            If Not Path.GetFullPath(old_path).ToUpper = Path.GetFullPath(SAVE_PATH + "\" + node.FullPath).ToUpper Then
+                If DirectoryExists(Path.GetDirectoryName(old_path)) Then
+                    For Each file In GetFiles(Path.GetDirectoryName(old_path), FileIO.SearchOption.SearchTopLevelOnly, {Path.GetFileName(old_path) + ".*"})
+                        MoveFile(file, SAVE_PATH + "\" + node.FullPath + Path.GetExtension(file))
+                    Next
+                End If
             End If
+            If DirectoryExists(old_path) Then RenameDirectory(old_path, node.Text)
         End If
-        If DirectoryExists(old_path) Then RenameDirectory(old_path, node.Text)
 
         For Each tabPage As TabPage In TabControl1.TabPages
             If tabPage.Text = "Options" Then Continue For
@@ -953,6 +989,7 @@ Public Class Form1
 
     'Save
     Private Sub ToolStripButton1_Click(sender As Object, e As EventArgs) Handles ToolStripButton1.Click
+        Dim t = DateTime.Now
         ToolStripButton22.Visible = True : Me.Refresh()
         order.Clear()
         If Not DirectoryExists(SAVE_PATH) Then CreateDirectory(SAVE_PATH)
@@ -970,6 +1007,10 @@ Public Class Form1
         w.Close()
 
         ToolStripButton22.Visible = False
+
+        Dim t2 = DateTime.Now - t
+        'Label7.Text = "Last save time: " + t2.Seconds.ToString + "." + t2.Milliseconds.ToString + " seconds"
+        Label7.Text = "Last save time: " + Math.Round(t2.TotalSeconds, 3).ToString + " seconds"
     End Sub
     Private Sub saveNodeRecursively(node As TreeNode, Optional forceResaveAll As Boolean = False)
         Dim dir = ""
@@ -1029,7 +1070,7 @@ Public Class Form1
         Next
     End Sub
 
-#Region "Text formating toolbar"
+#Region "Toolbar"
     'Text formating - set page color
     Private Sub ToolStripButton5_Click(sender As Object, e As EventArgs) Handles ToolStripButton5.Click
         If refr Then Exit Sub
@@ -1363,12 +1404,14 @@ Public Class Form1
         If Not TabControl1.TabPages.Contains(optionsTabPage) Then
             TabControl1.TabPages.Add(optionsTabPage)
             TabControl1.SelectedTab = optionsTabPage
+        Else
+            TabControl1.SelectedTab = optionsTabPage
         End If
     End Sub
 #End Region
 
 #Region "Search"
-    'search
+    'search - in a note
     Private Sub ToolStripButton18_Click(sender As Object, e As EventArgs) Handles ToolStripButton18.Click
         If refr Then Exit Sub
         Dim tab = TabControl1.SelectedTab
@@ -1397,11 +1440,16 @@ Public Class Form1
 
         get_nodes_recursively()
         For Each node In tmpNodeList
+            Dim added_lines As New List(Of Integer)
             Dim added As Boolean = False
             Dim start As Integer = 0
             Dim searchCount As Integer = 0
             Dim rtfTmp As New RichTextBox
             rtfTmp.WordWrap = False
+            If content(node).Contains("{%%%UNLOADED%%%") Then
+                Dim f = SAVE_PATH + "\" + node.FullPath + ".zam"
+                If FileExists(f) Then content(node) = load_content(f, node)
+            End If
             If content(node).ToUpper.StartsWith("{\RTF") Then
                 rtfTmp.Rtf = content(node)
             Else
@@ -1420,6 +1468,8 @@ Public Class Form1
                 'get row
                 Dim row = rtfTmp.GetLineFromCharIndex(start)
                 Dim text = rtfTmp.Lines(row)
+                start += 1
+                If added_lines.Contains(row) Then Continue Do Else added_lines.Add(row)
 
                 'get previous row
                 If row >= 1 Then text = rtfTmp.Lines(row - 1) + vbCrLf + text
@@ -1428,7 +1478,6 @@ Public Class Form1
                 If row < rtfTmp.Lines.Count - 1 Then text = text + vbCrLf + rtfTmp.Lines(row + 1)
 
                 rtf.Text += text + vbCrLf + vbCrLf
-                start += 1
                 searchCount += 1
                 If searchCount > 100 Then Exit Do
             Loop
@@ -1443,6 +1492,7 @@ Public Class Form1
             rtf.SelectionColor = Color.Yellow
             startIndex = index + search.Length
         Loop
+        If rtf.Text.Length > 3 Then rtf.Select(rtf.Text.Length - 1, 0)
     End Sub
     Private Sub get_nodes_recursively(Optional node As TreeNode = Nothing)
         If node Is Nothing Then
@@ -1579,6 +1629,25 @@ Public Class Form1
         CloseToTrayToolStripMenuItem.Checked = Not CloseToTrayToolStripMenuItem.Checked
         ini.IniWriteValue("Main", "Tray_close", CloseToTrayToolStripMenuItem.Checked.ToString)
     End Sub
+    'Menu Options/Backup/Create backup
+    Private Sub CreateNowToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles CreateNowToolStripMenuItem.Click
+        If Not DirectoryExists(SAVE_PATH + "\!!!Backups") Then CreateDirectory(SAVE_PATH + "\!!!Backups")
+
+        Dim d = DateTime.Now
+        Dim b = d.Year.ToString + "-" + d.Month.ToString + "-" + d.Day.ToString + " " + d.Hour.ToString + "." + d.Minute.ToString + "." + d.Second.ToString + "." + d.Millisecond.ToString
+        CreateDirectory(SAVE_PATH + "\!!!Backups\" + b)
+
+        For Each Dr In GetDirectories(SAVE_PATH)
+            Dim dName = Dr.Substring(Dr.LastIndexOf("\") + 1)
+            If Not dName.ToUpper = "!!!BACKUPS" Then
+                CopyDirectory(Dr, SAVE_PATH + "\!!!Backups\" + b + "\" + dName)
+            End If
+        Next
+        For Each f In GetFiles(SAVE_PATH)
+            FileCopy(f, SAVE_PATH + "\!!!Backups\" + b + "\" + Path.GetFileName(f))
+        Next
+        BackupsToolStripMenuItem.DropDownItems.Add(b)
+    End Sub
 #End Region
 
 #Region "Context Menu"
@@ -1655,6 +1724,23 @@ Public Class Form1
                 DataObject.SetData(DataFormats.FileDrop, True, {file})
                 Clipboard.SetDataObject(DataObject)
             End If
+        End If
+    End Sub
+    'Sort children
+    Private Sub SortChildrensToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles SortChildrensToolStripMenuItem.Click
+        If nodeForContextMenu IsNot Nothing AndAlso nodeForContextMenu.Nodes.Count > 1 Then
+            Dim g As New List(Of TreeNode)
+            'g = nodeForContextMenu.Nodes.Cast(Of TreeNode).ToList
+            For Each t As TreeNode In nodeForContextMenu.Nodes
+                g.Add(t)
+            Next
+            g.Sort(New NodeSorter)
+            For Each t As TreeNode In g
+                t.Remove()
+            Next
+            For Each t As TreeNode In g
+                nodeForContextMenu.Nodes.Add(t)
+            Next
         End If
     End Sub
     'Set fore color
@@ -1940,6 +2026,11 @@ Public Class Form1
     Private Sub CheckBox8_CheckedChanged(sender As Object, e As EventArgs) Handles CheckBox8.CheckedChanged
         ini.IniWriteValue("Main", "HotTrack", CheckBox8.Checked.ToString)
     End Sub
+    'Focus rtf on tree click
+    Private Sub CheckBox9_CheckedChanged(sender As Object, e As EventArgs) Handles CheckBox9.CheckedChanged
+        focusRtfNextTime = Nothing
+        ini.IniWriteValue("Main", "HotTrack", CheckBox9.Checked.ToString)
+    End Sub
 #End Region
 
 #Region "Drag n drop"
@@ -1969,13 +2060,17 @@ Public Class Form1
 
             If DestinationNode IsNot Nothing Then
                 If Not DestinationNode Is draggedNode Then
+                    Dim DragPath = draggedNode.FullPath.ToUpper
+                    Dim DestPath = DestinationNode.FullPath.ToUpper
+                    If DestPath.StartsWith(DragPath) Then MsgBox("Move a node to its child node won't work.") : draggedNode = Nothing : Exit Sub
+
                     draggedNode.Remove()
                     new_name = getNewName(DestinationNode, draggedNode.Text, True)
 
                     DestinationNode.Nodes.Add(draggedNode)
                     DestinationNode.Expand()
                 Else
-                    Exit Sub
+                    draggedNode = Nothing : Exit Sub
                 End If
             Else
                 draggedNode.Remove()
@@ -1992,8 +2087,8 @@ Public Class Form1
                         MoveFile(file, SAVE_PATH + "\" + draggedNode.FullPath + Path.GetExtension(file))
                     Next
                 End If
+                If DirectoryExists(old_path) Then MoveDirectory(old_path, SAVE_PATH + "\" + draggedNode.FullPath)
             End If
-            If DirectoryExists(old_path) Then MoveDirectory(old_path, SAVE_PATH + "\" + draggedNode.FullPath)
 
             draggedNode = Nothing
         End If

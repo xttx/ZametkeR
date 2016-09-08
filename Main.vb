@@ -64,3 +64,12 @@
 #End Region
 
 End Class
+
+Public Class NodeSorter
+    Implements IComparer(Of TreeNode)
+
+    Public Function Compare(x As TreeNode, y As TreeNode) As Integer Implements IComparer(Of TreeNode).Compare
+        'Return x.Text.CompareTo(y.Text)
+        Return String.Compare(x.Text, y.Text)
+    End Function
+End Class
