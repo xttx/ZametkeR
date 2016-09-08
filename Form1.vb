@@ -562,14 +562,14 @@ Public Class Form1
         If words.Count > 1 Then newname = words(0) + " " + words(1)
 
         'add page
-        ToolStripButton2_Click(ToolStripButton2, New EventArgs)
+        ToolStripButton2_Click(ToolStripButton2, New EventArgs, newname)
 
         'Set content
         content(TreeView1.SelectedNode) = Clipboard.GetText.Trim
         openNote(TreeView1.SelectedNode)
 
         'renaming
-        ToolStripButton20_rename_sub(newname)
+        'ToolStripButton20_rename_sub(newname)
     End Sub
 
     'Change rtf text
@@ -707,13 +707,15 @@ Public Class Form1
 
 
     'Add page
-    Private Sub ToolStripButton2_Click(sender As Object, e As EventArgs) Handles ToolStripButton2.Click
+    Private Sub ToolStripButton2_Click(sender As Object, e As EventArgs, Optional new_name As String = "") Handles ToolStripButton2.Click
         Dim c As Integer = 0
         Dim node_main As TreeNode = nodeForContextMenu2
         If node_main Is Nothing Then node_main = TreeView1.SelectedNode
 
         Dim node As TreeNode = Nothing
         Dim default_text = "New Page"
+        If new_name <> "" Then default_text = new_name
+
         If node_main Is Nothing Then
             default_text = getNewName(node_main, default_text)
             node = TreeView1.Nodes.Add(default_text, default_text)
@@ -816,14 +818,14 @@ Public Class Form1
         Loop
         If newname = "" Then Exit Sub
 
-
-        If node.Parent Is Nothing Then
-            newname = getNewName(node.Parent, newname)
-            'If TreeView1.Nodes(newname) IsNot Nothing Then MsgBox("Note with this name already exist in the same level of the tree") : Exit Sub
-        Else
-            newname = getNewName(node.Parent, newname)
-            'If node.Parent.Nodes(newName) IsNot Nothing Then MsgBox("Note with this name already exist in the same level of the tree") : Exit Sub
-        End If
+        If Not newname = node.Text Then newname = getNewName(node, newname)
+        'If node.Parent Is Nothing Then
+        '    newname = getNewName(node.Parent, newname)
+        '    'If TreeView1.Nodes(newname) IsNot Nothing Then MsgBox("Note with this name already exist in the same level of the tree") : Exit Sub
+        'Else
+        '    newname = getNewName(node.Parent, newname)
+        '    'If node.Parent.Nodes(newName) IsNot Nothing Then MsgBox("Note with this name already exist in the same level of the tree") : Exit Sub
+        'End If
 
         Dim old_path = SAVE_PATH + "\" + node.FullPath
         node.Name = newname
@@ -930,6 +932,7 @@ Public Class Form1
 
         If Not checkInsideNode Then
             If node Is Nothing OrElse node.Parent Is Nothing Then
+
                 Do While TreeView1.Nodes(new_name) IsNot Nothing
                     c += 1
                     new_name = name + " (" + c.ToString + ")"
