@@ -799,6 +799,8 @@ Public Class Form1
             If MsgBox("Selected page has children. They will all be deleted. Are you sure?", MsgBoxStyle.YesNo) = MsgBoxResult.No Then Exit Sub
         End If
 
+        Dim ind = node_main.Index
+        Dim parent = node_main.Parent
         removeRecursively(node_main)
         Dim t = node_main.Parent
         node_main.Remove()
@@ -806,6 +808,19 @@ Public Class Form1
 
         'handle encrypt button
         TabControl1_SelectedIndexChanged(TabControl1, New EventArgs)
+
+        'set selected node
+        If TreeView1.Nodes.Count > 0 Then
+            Dim node_sel As TreeNode = Nothing
+            Dim nodes_p As TreeNodeCollection = Nothing
+            If parent Is Nothing Then nodes_p = TreeView1.Nodes Else nodes_p = parent.Nodes
+            If nodes_p.Count = 0 Then
+                If parent IsNot Nothing Then node_sel = parent
+            Else
+                If nodes_p.Count > ind Then node_sel = nodes_p(ind) Else node_sel = nodes_p(nodes_p.Count - 1)
+            End If
+            If node_sel IsNot Nothing Then TreeView1.SelectedNode = node_sel
+        End If
     End Sub
     Private Sub removeRecursively(node As TreeNode)
         For Each sub_node In node.Nodes
@@ -2034,6 +2049,7 @@ Public Class Form1
 #End Region
 
 #Region "Drag n drop"
+    Dim alt As Boolean = False
     Dim draggedNode As TreeNode = Nothing
     Private Sub TreeView1_ItemDrag(sender As Object, e As ItemDragEventArgs) Handles TreeView1.ItemDrag
         draggedNode = DirectCast(e.Item, TreeNode)
@@ -2041,13 +2057,63 @@ Public Class Form1
         Dim DataObject As New DataObject
         Dim file = Path.Combine(Application.StartupPath, SAVE_PATH + "\" + draggedNode.FullPath + ".zam")
         If FileExists(file) Then DataObject.SetData(DataFormats.FileDrop, True, {file})
-        TreeView1.DoDragDrop(DataObject, DragDropEffects.Copy)
+        TreeView1.DoDragDrop(DataObject, DragDropEffects.All)
     End Sub
 
     Private Sub TreeView1_DragEnter(sender As Object, e As DragEventArgs) Handles TreeView1.DragEnter
-        e.Effect = DragDropEffects.Copy
+        If (e.KeyState And 8) = 8 Then
+            e.Effect = DragDropEffects.Copy
+        Else
+            e.Effect = DragDropEffects.Move
+        End If
+        If (e.KeyState And 32) = 32 Then alt = True Else alt = False
+    End Sub
+    Private Sub TreeView1_DragOver(sender As Object, e As DragEventArgs) Handles TreeView1.DragOver
+        If (e.KeyState And 8) = 8 Then
+            e.Effect = DragDropEffects.Copy
+        Else
+            e.Effect = DragDropEffects.Move
+        End If
+        If (e.KeyState And 32) = 32 Then alt = True Else alt = False
     End Sub
 
+    'Draw label
+    Private Sub TreeView1_GiveFeedback(sender As Object, e As GiveFeedbackEventArgs) Handles TreeView1.GiveFeedback
+        'e.UseDefaultCursors = False
+        'Cursor.Current = Cursors.Cross
+
+        'If ((e.Effect And DragDropEffects.Copy) = DragDropEffects.Copy) Then
+        If (e.Effect = DragDropEffects.Copy Or e.Effect = DragDropEffects.Move) Then
+            If e.Effect = DragDropEffects.Move Then
+                If alt Then Label6.Text = "(ch pos) " + draggedNode.Text Else Label6.Text = draggedNode.Text
+            Else
+                If alt Then Label6.Text = "(ch pos)(copy) " + draggedNode.Text Else Label6.Text = "(copy) " + draggedNode.Text
+            End If
+
+            Label6.Visible = True
+            Dim pt = TreeView1.PointToClient(Cursor.Position)
+            Label6.Location = New Point(pt.X + 15, pt.Y + 5)
+        Else
+            Label6.Visible = False
+        End If
+    End Sub
+
+    'Handle cancel with esc
+    Private Sub TreeView1_QueryContinueDrag(sender As Object, e As QueryContinueDragEventArgs) Handles TreeView1.QueryContinueDrag
+        'ESC pressed
+        If e.EscapePressed Then
+            e.Action = DragAction.Cancel
+            Exit Sub
+        End If
+        'Drop!
+        If e.KeyState = 0 Then
+            e.Action = DragAction.Drop
+            Exit Sub
+        End If
+        e.Action = DragAction.Continue
+    End Sub
+
+    'DROP
     Private Sub TreeView1_DragDrop(sender As Object, e As DragEventArgs) Handles TreeView1.DragDrop
         Label6.Visible = False
 
@@ -2064,59 +2130,54 @@ Public Class Form1
                     Dim DestPath = DestinationNode.FullPath.ToUpper
                     If DestPath.StartsWith(DragPath) Then MsgBox("Move a node to its child node won't work.") : draggedNode = Nothing : Exit Sub
 
-                    draggedNode.Remove()
+                    If e.Effect = DragDropEffects.Move Then draggedNode.Remove()
                     new_name = getNewName(DestinationNode, draggedNode.Text, True)
+                    If e.Effect = DragDropEffects.Copy Then
+                        Dim old_content = content(draggedNode)
+                        draggedNode = New TreeNode With {.Name = new_name, .Text = new_name}
+                        content.Add(draggedNode, old_content)
+                    End If
 
-                    DestinationNode.Nodes.Add(draggedNode)
-                    DestinationNode.Expand()
+                    If alt Then
+                        Dim ind = DestinationNode.Index
+                        Dim p As TreeNodeCollection
+                        If DestinationNode.Parent Is Nothing Then p = TreeView1.Nodes Else p = DestinationNode.Parent.Nodes
+                        p.Insert(ind, draggedNode)
+                    Else
+                        DestinationNode.Nodes.Add(draggedNode)
+                        DestinationNode.Expand()
+                    End If
                 Else
                     draggedNode = Nothing : Exit Sub
                 End If
             Else
-                draggedNode.Remove()
+                If e.Effect = DragDropEffects.Move Then draggedNode.Remove()
                 new_name = getNewName(Nothing, draggedNode.Text)
+                If e.Effect = DragDropEffects.Copy Then
+                    Dim old_content = content(draggedNode)
+                    draggedNode = New TreeNode With {.Name = new_name, .Text = new_name}
+                    content.Add(draggedNode, old_content)
+                End If
 
                 TreeView1.Nodes.Add(draggedNode)
             End If
             draggedNode.Name = new_name
             draggedNode.Text = new_name
 
-            If Not Path.GetFullPath(old_path).ToUpper = Path.GetFullPath(SAVE_PATH + "\" + draggedNode.FullPath).ToUpper Then
-                If DirectoryExists(Path.GetDirectoryName(old_path)) Then
-                    For Each file In GetFiles(Path.GetDirectoryName(old_path), FileIO.SearchOption.SearchTopLevelOnly, {Path.GetFileName(old_path) + ".*"})
-                        MoveFile(file, SAVE_PATH + "\" + draggedNode.FullPath + Path.GetExtension(file))
-                    Next
+            If e.Effect = DragDropEffects.Move Then
+                If Not Path.GetFullPath(old_path).ToUpper = Path.GetFullPath(SAVE_PATH + "\" + draggedNode.FullPath).ToUpper Then
+                    If DirectoryExists(Path.GetDirectoryName(old_path)) Then
+                        For Each file In GetFiles(Path.GetDirectoryName(old_path), FileIO.SearchOption.SearchTopLevelOnly, {Path.GetFileName(old_path) + ".*"})
+                            MoveFile(file, SAVE_PATH + "\" + draggedNode.FullPath + Path.GetExtension(file))
+                        Next
+                    End If
+                    If DirectoryExists(old_path) Then MoveDirectory(old_path, SAVE_PATH + "\" + draggedNode.FullPath)
                 End If
-                If DirectoryExists(old_path) Then MoveDirectory(old_path, SAVE_PATH + "\" + draggedNode.FullPath)
             End If
 
             draggedNode = Nothing
         End If
     End Sub
 
-    Private Sub TreeView1_GiveFeedback(sender As Object, e As GiveFeedbackEventArgs) Handles TreeView1.GiveFeedback
-        If ((e.Effect And DragDropEffects.Copy) = DragDropEffects.Copy) Then
-            Label6.Text = draggedNode.Text
-            Label6.Visible = True
-            Dim pt = TreeView1.PointToClient(Cursor.Position)
-            Label6.Location = New Point(pt.X + 15, pt.Y + 5)
-        Else
-            Label6.Visible = False
-        End If
-    End Sub
-
-    Private Sub TreeView1_QueryContinueDrag(sender As Object, e As QueryContinueDragEventArgs) Handles TreeView1.QueryContinueDrag
-        'ESC pressed
-        If e.EscapePressed Then
-            e.Action = DragAction.Cancel
-            Exit Sub
-        End If
-        'Drop!
-        If e.KeyState = 0 Then
-            e.Action = DragAction.Drop
-            Exit Sub
-        End If
-        e.Action = DragAction.Continue
-    End Sub
 #End Region
 End Class
