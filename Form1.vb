@@ -1381,8 +1381,42 @@ Public Class Form1
             End If
         End If
     End Sub
+    'Move tab left
+    Private Sub ToolStripButton30_Click(sender As Object, e As EventArgs) Handles ToolStripButton30.Click
+        If TabControl1.TabPages.Count > 0 Then
+            If TabControl1.SelectedTab IsNot Nothing Then
+                If TabControl1.SelectedTab IsNot optionsTabPage Then
+                    Dim ind As Integer = TabControl1.SelectedIndex
+                    If ind > 0 Then
+                        Dim t As TabPage = TabControl1.SelectedTab
+                        TabControl1.TabPages.Remove(t)
+                        TabControl1.TabPages.Insert(ind - 1, t)
+                        TabControl1.SelectedTab = t
+                    End If
+                End If
+            End If
+        End If
+    End Sub
+    'Move tab right
+    Private Sub ToolStripButton29_Click(sender As Object, e As EventArgs) Handles ToolStripButton29.Click
+        If TabControl1.TabPages.Count > 0 Then
+            If TabControl1.SelectedTab IsNot Nothing Then
+                If TabControl1.SelectedTab IsNot optionsTabPage Then
+                    Dim ind As Integer = TabControl1.SelectedIndex
+                    If ind < TabControl1.TabPages.Count - 1 Then
+                        Dim t As TabPage = TabControl1.SelectedTab
+                        TabControl1.TabPages.Remove(t)
+                        TabControl1.TabPages.Insert(ind + 1, t)
+                        TabControl1.SelectedTab = t
+                    End If
+                End If
+            End If
+        End If
+    End Sub
+
     'Text formating - refresh controls
     Private Sub rtf_SelectionChanged(sender As Object, e As EventArgs)
+        Dim refrWasTrue As Boolean = refr
         refr = True
         Dim rtf = DirectCast(sender, RichTextBox)
         Dim f = rtf.SelectionFont
@@ -1412,7 +1446,7 @@ Public Class Form1
             ToolStripButton13.Checked = True
             ToolStripButton14.Checked = False
         End If
-        refr = False
+        If Not refrWasTrue Then refr = False
     End Sub
     'Options
     Private Sub ToolStripButton27_Click(sender As Object, e As EventArgs) Handles ToolStripButton27.Click
@@ -2126,8 +2160,8 @@ Public Class Form1
 
             If DestinationNode IsNot Nothing Then
                 If Not DestinationNode Is draggedNode Then
-                    Dim DragPath = draggedNode.FullPath.ToUpper
-                    Dim DestPath = DestinationNode.FullPath.ToUpper
+                    Dim DragPath = draggedNode.FullPath.ToUpper + "\"
+                    Dim DestPath = DestinationNode.FullPath.ToUpper + "\"
                     If DestPath.StartsWith(DragPath) Then MsgBox("Move a node to its child node won't work.") : draggedNode = Nothing : Exit Sub
 
                     If e.Effect = DragDropEffects.Move Then draggedNode.Remove()

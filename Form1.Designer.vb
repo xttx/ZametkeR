@@ -87,6 +87,9 @@ Partial Class Form1
         Me.StartInTrayToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.MinimizeToTrayToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.CloseToTrayToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.BackupsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.CreateNowToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripMenuItem18 = New System.Windows.Forms.ToolStripSeparator()
         Me.ToolStrip1 = New System.Windows.Forms.ToolStrip()
         Me.ToolStripButton1 = New System.Windows.Forms.ToolStripButton()
         Me.ToolStripSeparator3 = New System.Windows.Forms.ToolStripSeparator()
@@ -176,9 +179,8 @@ Partial Class Form1
         Me.SetCustomIconToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripMenuItem3 = New System.Windows.Forms.ToolStripSeparator()
         Me.PastAsNewNoteToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-        Me.BackupsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-        Me.CreateNowToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-        Me.ToolStripMenuItem18 = New System.Windows.Forms.ToolStripSeparator()
+        Me.ToolStripButton29 = New System.Windows.Forms.ToolStripButton()
+        Me.ToolStripButton30 = New System.Windows.Forms.ToolStripButton()
         Me.TabControl1.SuspendLayout()
         Me.TabPageOptions.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
@@ -759,9 +761,27 @@ Partial Class Form1
         Me.CloseToTrayToolStripMenuItem.Size = New System.Drawing.Size(160, 22)
         Me.CloseToTrayToolStripMenuItem.Text = "Close to tray"
         '
+        'BackupsToolStripMenuItem
+        '
+        Me.BackupsToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.CreateNowToolStripMenuItem, Me.ToolStripMenuItem18})
+        Me.BackupsToolStripMenuItem.Name = "BackupsToolStripMenuItem"
+        Me.BackupsToolStripMenuItem.Size = New System.Drawing.Size(244, 22)
+        Me.BackupsToolStripMenuItem.Text = "Backups"
+        '
+        'CreateNowToolStripMenuItem
+        '
+        Me.CreateNowToolStripMenuItem.Name = "CreateNowToolStripMenuItem"
+        Me.CreateNowToolStripMenuItem.Size = New System.Drawing.Size(136, 22)
+        Me.CreateNowToolStripMenuItem.Text = "Create Now"
+        '
+        'ToolStripMenuItem18
+        '
+        Me.ToolStripMenuItem18.Name = "ToolStripMenuItem18"
+        Me.ToolStripMenuItem18.Size = New System.Drawing.Size(133, 6)
+        '
         'ToolStrip1
         '
-        Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripButton1, Me.ToolStripSeparator3, Me.ToolStripButton5, Me.ToolStripSeparator2, Me.ToolStripComboBox2, Me.ToolStripComboBox1, Me.ToolStripButton6, Me.ToolStripButton7, Me.ToolStripSeparator4, Me.ToolStripButton8, Me.ToolStripButton9, Me.ToolStripButton10, Me.ToolStripButton15, Me.ToolStripSeparator5, Me.ToolStripButton11, Me.ToolStripButton12, Me.ToolStripButton13, Me.ToolStripButton14, Me.ToolStripSeparator6, Me.ToolStripButton16, Me.ToolStripButton17, Me.ToolStripSeparator7, Me.ToolStripButton18, Me.ToolStripButton19, Me.ToolStripButton22, Me.ToolStripSeparator9, Me.ToolStripButton25, Me.ToolStripButton26, Me.ToolStripButton27})
+        Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripButton1, Me.ToolStripSeparator3, Me.ToolStripButton5, Me.ToolStripSeparator2, Me.ToolStripComboBox2, Me.ToolStripComboBox1, Me.ToolStripButton6, Me.ToolStripButton7, Me.ToolStripSeparator4, Me.ToolStripButton8, Me.ToolStripButton9, Me.ToolStripButton10, Me.ToolStripButton15, Me.ToolStripSeparator5, Me.ToolStripButton11, Me.ToolStripButton12, Me.ToolStripButton13, Me.ToolStripButton14, Me.ToolStripSeparator6, Me.ToolStripButton16, Me.ToolStripButton17, Me.ToolStripSeparator7, Me.ToolStripButton18, Me.ToolStripButton19, Me.ToolStripButton22, Me.ToolStripSeparator9, Me.ToolStripButton25, Me.ToolStripButton26, Me.ToolStripButton27, Me.ToolStripButton29, Me.ToolStripButton30})
         Me.ToolStrip1.Location = New System.Drawing.Point(0, 24)
         Me.ToolStrip1.Name = "ToolStrip1"
         Me.ToolStrip1.Size = New System.Drawing.Size(837, 25)
@@ -1532,23 +1552,27 @@ Partial Class Form1
         Me.PastAsNewNoteToolStripMenuItem.Size = New System.Drawing.Size(176, 22)
         Me.PastAsNewNoteToolStripMenuItem.Text = "Past as new note"
         '
-        'BackupsToolStripMenuItem
+        'ToolStripButton29
         '
-        Me.BackupsToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.CreateNowToolStripMenuItem, Me.ToolStripMenuItem18})
-        Me.BackupsToolStripMenuItem.Name = "BackupsToolStripMenuItem"
-        Me.BackupsToolStripMenuItem.Size = New System.Drawing.Size(244, 22)
-        Me.BackupsToolStripMenuItem.Text = "Backups"
+        Me.ToolStripButton29.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right
+        Me.ToolStripButton29.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
+        Me.ToolStripButton29.Image = CType(resources.GetObject("ToolStripButton29.Image"), System.Drawing.Image)
+        Me.ToolStripButton29.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.ToolStripButton29.Name = "ToolStripButton29"
+        Me.ToolStripButton29.Size = New System.Drawing.Size(23, 22)
+        Me.ToolStripButton29.Text = "ToolStripButton29"
+        Me.ToolStripButton29.ToolTipText = "Move tab right"
         '
-        'CreateNowToolStripMenuItem
+        'ToolStripButton30
         '
-        Me.CreateNowToolStripMenuItem.Name = "CreateNowToolStripMenuItem"
-        Me.CreateNowToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
-        Me.CreateNowToolStripMenuItem.Text = "Create Now"
-        '
-        'ToolStripMenuItem18
-        '
-        Me.ToolStripMenuItem18.Name = "ToolStripMenuItem18"
-        Me.ToolStripMenuItem18.Size = New System.Drawing.Size(149, 6)
+        Me.ToolStripButton30.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right
+        Me.ToolStripButton30.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
+        Me.ToolStripButton30.Image = CType(resources.GetObject("ToolStripButton30.Image"), System.Drawing.Image)
+        Me.ToolStripButton30.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.ToolStripButton30.Name = "ToolStripButton30"
+        Me.ToolStripButton30.Size = New System.Drawing.Size(23, 22)
+        Me.ToolStripButton30.Text = "ToolStripButton30"
+        Me.ToolStripButton30.ToolTipText = "Move tableft"
         '
         'Form1
         '
@@ -1745,4 +1769,6 @@ Partial Class Form1
     Friend WithEvents BackupsToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents CreateNowToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents ToolStripMenuItem18 As ToolStripSeparator
+    Friend WithEvents ToolStripButton29 As ToolStripButton
+    Friend WithEvents ToolStripButton30 As ToolStripButton
 End Class
