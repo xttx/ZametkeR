@@ -182,6 +182,13 @@ Partial Class Form1
         Me.SetCustomIconToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripMenuItem3 = New System.Windows.Forms.ToolStripSeparator()
         Me.PastAsNewNoteToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ContextMenu_tree = New System.Windows.Forms.ContextMenuStrip(Me.components)
+        Me.ToolStripMenuItem19 = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripMenuItem20 = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ContextMenu_text = New System.Windows.Forms.ContextMenuStrip(Me.components)
+        Me.MenuItem_pass = New System.Windows.Forms.ToolStripMenuItem()
+        Me.MenuItem_resetColors = New System.Windows.Forms.ToolStripMenuItem()
+        Me.MenuItem_resetFont = New System.Windows.Forms.ToolStripMenuItem()
         Me.TabControl1.SuspendLayout()
         Me.TabPageOptions.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
@@ -196,6 +203,8 @@ Partial Class Form1
         Me.Panel1.SuspendLayout()
         Me.ToolStrip2.SuspendLayout()
         Me.ContextMenu_treeNode.SuspendLayout()
+        Me.ContextMenu_tree.SuspendLayout()
+        Me.ContextMenu_text.SuspendLayout()
         Me.SuspendLayout()
         '
         'TabControl1
@@ -1581,6 +1590,48 @@ Partial Class Form1
         Me.PastAsNewNoteToolStripMenuItem.Size = New System.Drawing.Size(176, 22)
         Me.PastAsNewNoteToolStripMenuItem.Text = "Past as new note"
         '
+        'ContextMenu_tree
+        '
+        Me.ContextMenu_tree.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripMenuItem19, Me.ToolStripMenuItem20})
+        Me.ContextMenu_tree.Name = "ContextMenu_tree"
+        Me.ContextMenu_tree.Size = New System.Drawing.Size(135, 48)
+        '
+        'ToolStripMenuItem19
+        '
+        Me.ToolStripMenuItem19.Name = "ToolStripMenuItem19"
+        Me.ToolStripMenuItem19.Size = New System.Drawing.Size(134, 22)
+        Me.ToolStripMenuItem19.Text = "Expand all"
+        '
+        'ToolStripMenuItem20
+        '
+        Me.ToolStripMenuItem20.Name = "ToolStripMenuItem20"
+        Me.ToolStripMenuItem20.Size = New System.Drawing.Size(134, 22)
+        Me.ToolStripMenuItem20.Text = "Collapse all"
+        '
+        'ContextMenu_text
+        '
+        Me.ContextMenu_text.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.MenuItem_resetFont, Me.MenuItem_resetColors, Me.MenuItem_pass})
+        Me.ContextMenu_text.Name = "ContextMenu_text"
+        Me.ContextMenu_text.Size = New System.Drawing.Size(158, 70)
+        '
+        'MenuItem_pass
+        '
+        Me.MenuItem_pass.Name = "MenuItem_pass"
+        Me.MenuItem_pass.Size = New System.Drawing.Size(157, 22)
+        Me.MenuItem_pass.Text = "Set as password"
+        '
+        'MenuItem_resetColors
+        '
+        Me.MenuItem_resetColors.Name = "MenuItem_resetColors"
+        Me.MenuItem_resetColors.Size = New System.Drawing.Size(157, 22)
+        Me.MenuItem_resetColors.Text = "Reset colors"
+        '
+        'MenuItem_resetFont
+        '
+        Me.MenuItem_resetFont.Name = "MenuItem_resetFont"
+        Me.MenuItem_resetFont.Size = New System.Drawing.Size(157, 22)
+        Me.MenuItem_resetFont.Text = "Reset Font"
+        '
         'Form1
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -1616,6 +1667,8 @@ Partial Class Form1
         Me.ToolStrip2.ResumeLayout(False)
         Me.ToolStrip2.PerformLayout()
         Me.ContextMenu_treeNode.ResumeLayout(False)
+        Me.ContextMenu_tree.ResumeLayout(False)
+        Me.ContextMenu_text.ResumeLayout(False)
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -1779,4 +1832,11 @@ Partial Class Form1
     Friend WithEvents ToolStripButton29 As ToolStripButton
     Friend WithEvents ToolStripButton30 As ToolStripButton
     Friend WithEvents ShowBackupsInTreeToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents ContextMenu_tree As ContextMenuStrip
+    Friend WithEvents ToolStripMenuItem19 As ToolStripMenuItem
+    Friend WithEvents ToolStripMenuItem20 As ToolStripMenuItem
+    Friend WithEvents ContextMenu_text As ContextMenuStrip
+    Friend WithEvents MenuItem_resetFont As ToolStripMenuItem
+    Friend WithEvents MenuItem_resetColors As ToolStripMenuItem
+    Friend WithEvents MenuItem_pass As ToolStripMenuItem
 End Class

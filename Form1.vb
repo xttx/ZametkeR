@@ -401,9 +401,15 @@ Public Class Form1
         If refr Then Exit Sub
         openNote(e.Node)
     End Sub
+    Private Sub TreeView1_MouseDown(sender As Object, e As MouseEventArgs) Handles TreeView1.MouseDown
+        If e.Button = MouseButtons.Right Then
+            Dim p As Point = New Point(e.X, e.Y)
+            If TreeView1.GetNodeAt(p) Is Nothing Then ContextMenu_tree.Show(Cursor.Position)
+        End If
+    End Sub
     Private Sub TreeView1_NodeMouseClick(sender As Object, e As TreeNodeMouseClickEventArgs) Handles TreeView1.NodeMouseClick
-        If TreeView1.SelectedNode Is Nothing Then Exit Sub
         If e.Button = MouseButtons.Left Then
+            If TreeView1.SelectedNode Is Nothing Then Exit Sub
             If e.Node IsNot TreeView1.SelectedNode AndAlso CheckBox9.Checked Then focusRtfNextTime = New RichTextBox
             If e.Node Is TreeView1.SelectedNode Then TreeView1_AfterSelect(TreeView1, New TreeViewEventArgs(e.Node))
         ElseIf e.Button = MouseButtons.Right Then
@@ -584,6 +590,7 @@ Public Class Form1
         AddHandler rtf.TextChanged, AddressOf rtf_TextChanged
         AddHandler rtf.SelectionChanged, AddressOf rtf_SelectionChanged
         AddHandler rtf.MouseMove, AddressOf rtf_mouseMove
+        AddHandler rtf.MouseLeave, AddressOf rtf_mouseOut
         AddHandler rtf.MouseClick, AddressOf rtf_mouseClick
         rtf.Dock = DockStyle.Fill
         rtf.HideSelection = False
@@ -637,7 +644,7 @@ Public Class Form1
         If w_end1 < 0 Then w_end1 = txt.Length
         If w_end1 - w_str1 > 0 Then
             Dim substr = txt.Substring(w_str1, w_end1 - w_str1).Trim.ToUpper
-            If substr = "{SPOILER}" Or substr = "{%SPOILER%}" Then Cursor = Cursors.Hand Else Cursor = Cursors.Default
+            If substr = "{SPOILER}" Or substr = "{%SPOILER%}" Then Cursor = Cursors.Hand Else Cursor = Cursors.IBeam
         Else
             Cursor = Cursors.Default
         End If
@@ -673,6 +680,9 @@ Public Class Form1
             End If
         End If
         If CheckBox8.Checked And Not rtf.Focused Then rtf.Select()
+    End Sub
+    Private Sub rtf_mouseOut()
+        Cursor = Cursors.Default
     End Sub
     'Handle spoilers and context menus
     Private Sub rtf_mouseClick(sender As Object, e As MouseEventArgs)
@@ -1913,6 +1923,14 @@ Public Class Form1
     'Context Menu Hide
     Private Sub ContextMenuStrip1_Closing(sender As Object, e As ToolStripDropDownClosingEventArgs) Handles ContextMenu_treeNode.Closing
         nodeForContextMenu.BackColor = colorForContextMenu
+    End Sub
+
+    'Tree context menu
+    Private Sub expandAll() Handles ToolStripMenuItem19.Click
+        TreeView1.ExpandAll()
+    End Sub
+    Private Sub collapseAll() Handles ToolStripMenuItem20.Click
+        TreeView1.CollapseAll()
     End Sub
 #End Region
 
