@@ -24,6 +24,7 @@ Public Class Form1
     Dim SAVE_PATH_START As String = ""
     Dim colorArray = {"Red", "Blue", "Green", "Yellow", "Orange", "White", "Black", "Aqua", "Magenta", "Custom ..."}
     Dim focusRtfNextTime As RichTextBox = Nothing
+    Dim backupNode As TreeNode = Nothing
 
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         refr = True
@@ -162,7 +163,7 @@ Public Class Form1
 
         Dim files = GetFiles(SAVE_PATH, FileIO.SearchOption.SearchAllSubDirectories, {"*.zam"}).ToList
         For i As Integer = files.Count - 1 To 0 Step -1
-            If files(i).ToUpper.Contains("!!!BACKUPS") Then files.RemoveAt(i)
+            'If files(i).ToUpper.Contains("!!!BACKUPS") Then files.RemoveAt(i)
         Next
         If RadioButton3.Checked Or RadioButton4.Checked Then files.Sort()
 
@@ -270,6 +271,10 @@ Public Class Form1
                 node.SelectedImageKey = dir + fnameNoExt + ".png"
             End If
         Next
+
+        backupNode = TreeView1.Nodes("!!!BACKUPS")
+        If backupNode IsNot Nothing Then backupNode.Remove()
+
         If TreeView1.Nodes.Count > 0 Then TreeView1.SelectedNode = TreeView1.Nodes(0)
     End Sub
     Private Function load_content(f As String, node As TreeNode) As String
@@ -411,7 +416,7 @@ Public Class Form1
             nodeForContextMenu = e.Node
             colorForContextMenu = e.Node.BackColor
             e.Node.BackColor = Color.LightGray
-            ContextMenuStrip1.Show(Cursor.Position)
+            ContextMenu_treeNode.Show(Cursor.Position)
 
             'If e.Node Is TreeView1.SelectedNode Then Exit Sub
             'TreeView1.SelectedNode = e.Node
@@ -567,6 +572,9 @@ Public Class Form1
         'handle encrypt button
         TabControl1_SelectedIndexChanged(TabControl1, New EventArgs)
 
+        'read only for backups
+        If node.FullPath.ToUpper.StartsWith("!!!BACKUPS") Then rtf.ReadOnly = True Else rtf.ReadOnly = False
+
         'rtf to select
         If focusRtfNextTime IsNot Nothing Then rtf.Select() : focusRtfNextTime = rtf
         refr = False
@@ -576,6 +584,7 @@ Public Class Form1
         AddHandler rtf.TextChanged, AddressOf rtf_TextChanged
         AddHandler rtf.SelectionChanged, AddressOf rtf_SelectionChanged
         AddHandler rtf.MouseMove, AddressOf rtf_mouseMove
+        AddHandler rtf.MouseClick, AddressOf rtf_mouseClick
         rtf.Dock = DockStyle.Fill
         rtf.HideSelection = False
         rtf.AcceptsTab = True
@@ -613,9 +622,26 @@ Public Class Form1
             checkRemindersAstralis(rtf, node)
         End If
     End Sub
-    'Handle rtf image resize handlers and hotTrack
+    'Handle rtf image resize handlers, hotTrack and spoilers
     Private Sub rtf_mouseMove(sender As Object, e As MouseEventArgs)
         Dim rtf = DirectCast(sender, RichTextBox)
+
+        Dim txt = rtf.Text
+        Dim ind = rtf.GetCharIndexFromPosition(e.Location)
+        Dim w_str1 = txt.LastIndexOf(" ", ind, ind) + 1
+        Dim w_str2 = txt.LastIndexOf(vbLf, ind, ind) + 1
+        Dim w_end1 = txt.IndexOf(" ", ind)
+        Dim w_end2 = txt.IndexOf(vbLf, ind)
+        If w_str2 > w_str1 Then w_str1 = w_str2
+        If (w_end2 < w_end1 And w_end2 > w_str1) Or w_end1 < 1 Then w_end1 = w_end2
+        If w_end1 < 0 Then w_end1 = txt.Length
+        If w_end1 - w_str1 > 0 Then
+            Dim substr = txt.Substring(w_str1, w_end1 - w_str1).Trim.ToUpper
+            If substr = "{SPOILER}" Or substr = "{%SPOILER%}" Then Cursor = Cursors.Hand Else Cursor = Cursors.Default
+        Else
+            Cursor = Cursors.Default
+        End If
+
         If rtf.SelectionType = RichTextBoxSelectionTypes.Object AndAlso rtf.SelectionLength = 1 Then
             Dim bounds As Rectangle
             bounds.Location = rtf.GetPositionFromCharIndex(rtf.SelectionStart)
@@ -640,13 +666,47 @@ Public Class Form1
                 rtf.Cursor = Cursors.SizeNESW
             ElseIf (t Or b) And (e.X > centX - 4 And e.X < centX + 4) Then
                 rtf.Cursor = Cursors.SizeNS
-            ElseIf (l Or r) And (e.y > centy - 4 And e.y < centy + 4) Then
+            ElseIf (l Or r) And (e.Y > centY - 4 And e.Y < centY + 4) Then
                 rtf.Cursor = Cursors.SizeWE
             Else
                 rtf.Cursor = Cursors.IBeam
             End If
         End If
         If CheckBox8.Checked And Not rtf.Focused Then rtf.Select()
+    End Sub
+    'Handle spoilers and context menus
+    Private Sub rtf_mouseClick(sender As Object, e As MouseEventArgs)
+        Dim rtf = DirectCast(sender, RichTextBox)
+
+        Dim txt = rtf.Text
+        Dim ind = rtf.GetCharIndexFromPosition(e.Location)
+        Dim w_str1 = txt.LastIndexOf(" ", ind, ind) + 1
+        Dim w_str2 = txt.LastIndexOf(vbLf, ind, ind) + 1
+        Dim w_end1 = txt.IndexOf(" ", ind)
+        Dim w_end2 = txt.IndexOf(vbLf, ind)
+        If w_str2 > w_str1 Then w_str1 = w_str2
+        If (w_end2 < w_end1 And w_end2 > w_str1) Or w_end1 < 1 Then w_end1 = w_end2
+        If w_end1 < 0 Then w_end1 = txt.Length
+        If w_end1 - w_str1 > 0 Then
+            If txt.Substring(w_str1, w_end1 - w_str1).Trim.ToUpper = "{SPOILER}" Then
+                rtf.Select(w_str1, w_end1 - w_str1)
+                Clipboard.SetText("{%SPOILER%}")
+                rtf.Paste()
+
+                rtf.Select(w_end1 + 2, 0)
+                Clipboard.SetText(" { abraabraabra }")
+                'Clipboard.SetText(vbCrLf + "{ abraabraabra }")
+                'Clipboard.SetText(vbCrLf + "{" + vbCrLf + "abraabraabra" + vbCrLf + "}")
+                rtf.Paste()
+            ElseIf txt.Substring(w_str1, w_end1 - w_str1).Trim.ToUpper = "{%SPOILER%}" Then
+                rtf.Select(w_str1, w_end1 - w_str1)
+                Clipboard.SetText("{SPOILER}")
+                rtf.Paste()
+
+                rtf.Select(w_end1 - 1, txt.IndexOf("}", w_end1) - (w_end1 - 1))
+                rtf.SelectedText = ""
+            End If
+        End If
     End Sub
 
     'Draw tab close button
@@ -1030,6 +1090,7 @@ Public Class Form1
     Private Sub saveNodeRecursively(node As TreeNode, Optional forceResaveAll As Boolean = False)
         Dim dir = ""
         Dim p = node.FullPath
+        If p.ToUpper.StartsWith("!!!BACKUPS") Then Exit Sub
         order.Add(p)
         If p.Contains("\") Then dir = p.Substring(0, p.LastIndexOf("\"))
         If Not DirectoryExists(SAVE_PATH + "\" + dir) Then CreateDirectory(SAVE_PATH + "\" + dir)
@@ -1697,6 +1758,15 @@ Public Class Form1
         Next
         BackupsToolStripMenuItem.DropDownItems.Add(b)
     End Sub
+    'Menu Options/Backup/Show backups in tree
+    Private Sub ShowBackupsInTreeToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ShowBackupsInTreeToolStripMenuItem.Click
+        ShowBackupsInTreeToolStripMenuItem.Checked = Not ShowBackupsInTreeToolStripMenuItem.Checked
+        If ShowBackupsInTreeToolStripMenuItem.Checked Then
+            If backupNode IsNot Nothing Then TreeView1.Nodes.Add(backupNode)
+        Else
+            If backupNode IsNot Nothing Then backupNode.Remove()
+        End If
+    End Sub
 #End Region
 
 #Region "Context Menu"
@@ -1841,7 +1911,7 @@ Public Class Form1
     End Sub
 
     'Context Menu Hide
-    Private Sub ContextMenuStrip1_Closing(sender As Object, e As ToolStripDropDownClosingEventArgs) Handles ContextMenuStrip1.Closing
+    Private Sub ContextMenuStrip1_Closing(sender As Object, e As ToolStripDropDownClosingEventArgs) Handles ContextMenu_treeNode.Closing
         nodeForContextMenu.BackColor = colorForContextMenu
     End Sub
 #End Region
@@ -2212,6 +2282,5 @@ Public Class Form1
             draggedNode = Nothing
         End If
     End Sub
-
 #End Region
 End Class

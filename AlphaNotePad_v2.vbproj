@@ -34,8 +34,8 @@
     <OutputPath>bin\Release\</OutputPath>
     <DocumentationFile>ZametkeR.xml</DocumentationFile>
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
-    <UpdateAssemblyVersion>True</UpdateAssemblyVersion>
-    <UpdateAssemblyFileVersion>True</UpdateAssemblyFileVersion>
+    <UpdateAssemblyVersion>False</UpdateAssemblyVersion>
+    <UpdateAssemblyFileVersion>False</UpdateAssemblyFileVersion>
     <UpdateAssemblyInfoVersion>False</UpdateAssemblyInfoVersion>
     <AssemblyVersionSettings>None.None.Increment.DeltaDayStamp</AssemblyVersionSettings>
     <AssemblyFileVersionSettings>None.None.Increment.DeltaDayStamp</AssemblyFileVersionSettings>
