@@ -9,6 +9,7 @@ Public Class Form1
     End Function
 
     Dim refr As Boolean = False
+    Dim loaded As Boolean = False
     Dim order As New List(Of String)
     Dim crypt As New Cryptography("xus.ebr#usp//4u(hec*aT#hucharuzAC$cru")
     Dim reminders As New Reminders
@@ -28,6 +29,7 @@ Public Class Form1
 
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         refr = True
+        loaded = True
         optionsTabPage = TabControl1.TabPages(0)
         TabControl1.TabPages.Remove(optionsTabPage)
         For Each Font As FontFamily In System.Drawing.FontFamily.Families
@@ -129,14 +131,28 @@ Public Class Form1
 
         'Add backups menu items
         If DirectoryExists(SAVE_PATH + "\!!!Backups") Then
-            For Each f In GetDirectories(SAVE_PATH + "\!!!Backups")
-                BackupsToolStripMenuItem.DropDownItems.Add(f.Substring(f.LastIndexOf("\") + 1))
+            Dim flist = GetDirectories(SAVE_PATH + "\!!!Backups").ToList
+            flist.Sort()
+            For Each f In flist
+                Dim dd = f.Substring(f.LastIndexOf("\") + 1).Replace(".", ":")
+                dd = dd.Substring(0, dd.LastIndexOf(":"))
+                dd = DateTime.Parse(dd).ToLongDateString + " " + DateTime.Parse(dd).ToLongTimeString
+                Dim i = DirectCast(BackupsToolStripMenuItem.DropDownItems.Add(dd), ToolStripMenuItem)
+                Dim tmp = i.DropDownItems.Add("Restore Overwrite")
+                AddHandler tmp.Click, AddressOf backup_restore
+                tmp = i.DropDownItems.Add("Restore Full")
+                AddHandler tmp.Click, AddressOf backup_restore_full
+                tmp = i.DropDownItems.Add("Restore Delete")
+                AddHandler tmp.Click, AddressOf backup_delete
             Next
         End If
 
-        Dim d = DateTime.Now - loading_start
-        'Label5.Text = "ZametkeR was loaded in " + d.Seconds.ToString + "." + d.Milliseconds.ToString + " seconds"
-        Label5.Text = "ZametkeR was loaded in " + Math.Round(d.TotalSeconds, 3).ToString + " seconds"
+        If load_time Is Nothing OrElse load_time = "" Then
+            Dim d = DateTime.Now - loading_start
+            'Label5.Text = "ZametkeR was loaded in " + d.Seconds.ToString + "." + d.Milliseconds.ToString + " seconds"
+            load_time = "ZametkeR was loaded in " + Math.Round(d.TotalSeconds, 3).ToString + " seconds"
+        End If
+        Label5.Text = load_time
     End Sub
     Private Sub Form1_Closing(sender As Object, e As CancelEventArgs) Handles Me.Closing
         If AutosaveOnExitToolStripMenuItem.Checked Then ToolStripButton1_Click(ToolStripButton1, New EventArgs)
@@ -592,6 +608,7 @@ Public Class Form1
         AddHandler rtf.MouseMove, AddressOf rtf_mouseMove
         AddHandler rtf.MouseLeave, AddressOf rtf_mouseOut
         AddHandler rtf.MouseClick, AddressOf rtf_mouseClick
+        rtf.ContextMenuStrip = ContextMenu_text
         rtf.Dock = DockStyle.Fill
         rtf.HideSelection = False
         rtf.AcceptsTab = True
@@ -1753,8 +1770,10 @@ Public Class Form1
     Private Sub CreateNowToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles CreateNowToolStripMenuItem.Click
         If Not DirectoryExists(SAVE_PATH + "\!!!Backups") Then CreateDirectory(SAVE_PATH + "\!!!Backups")
 
-        Dim d = DateTime.Now
-        Dim b = d.Year.ToString + "-" + d.Month.ToString + "-" + d.Day.ToString + " " + d.Hour.ToString + "." + d.Minute.ToString + "." + d.Second.ToString + "." + d.Millisecond.ToString
+        'Dim d = DateTime.Now
+        'Dim b = d.Year.ToString + "-" + d.Month.ToString + "-" + d.Day.ToString + " " + d.Hour.ToString + "." + d.Minute.ToString + "." + d.Second.ToString + "." + d.Millisecond.ToString
+        Dim now = DateTime.Now
+        Dim b = now.ToString("yyyy-MM-dd HH.mm.ss.fff")
         CreateDirectory(SAVE_PATH + "\!!!Backups\" + b)
 
         For Each Dr In GetDirectories(SAVE_PATH)
@@ -1766,7 +1785,15 @@ Public Class Form1
         For Each f In GetFiles(SAVE_PATH)
             FileCopy(f, SAVE_PATH + "\!!!Backups\" + b + "\" + Path.GetFileName(f))
         Next
-        BackupsToolStripMenuItem.DropDownItems.Add(b)
+
+        Dim str = DateTime.Parse(now).ToLongDateString + " " + DateTime.Parse(now).ToLongTimeString
+        Dim i = DirectCast(BackupsToolStripMenuItem.DropDownItems.Add(str), ToolStripMenuItem)
+        Dim tmp = i.DropDownItems.Add("Restore Overwrite")
+        AddHandler tmp.Click, AddressOf backup_restore
+        tmp = i.DropDownItems.Add("Restore Full")
+        AddHandler tmp.Click, AddressOf backup_restore_full
+        tmp = i.DropDownItems.Add("Restore Delete")
+        AddHandler tmp.Click, AddressOf backup_delete
     End Sub
     'Menu Options/Backup/Show backups in tree
     Private Sub ShowBackupsInTreeToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ShowBackupsInTreeToolStripMenuItem.Click
@@ -1776,6 +1803,33 @@ Public Class Form1
         Else
             If backupNode IsNot Nothing Then backupNode.Remove()
         End If
+    End Sub
+    'Menu Options/Backup/Restore overwirte
+    Private Sub backup_restore(sender As Object, e As EventArgs)
+        Dim o = DirectCast(sender, ToolStripMenuItem)
+        Dim folder = DateTime.Parse(o.OwnerItem.Text).ToString("yyyy-MM-dd HH.mm.ss.fff")
+        Dim f = GetDirectories(SAVE_PATH + "\!!!Backups", SearchOption.TopDirectoryOnly, {folder + "*"}).ToArray
+        If f.Count = 0 Then MsgBox("Directory not found. Was it deleted while zametker was running?") : Exit Sub
+        folder = f(0)
+
+    End Sub
+    'Menu Options/Backup/Restore full
+    Private Sub backup_restore_full(sender As Object, e As EventArgs)
+        Dim o = DirectCast(sender, ToolStripMenuItem)
+        Dim folder = DateTime.Parse(o.OwnerItem.Text).ToString("yyyy-MM-dd HH.mm.ss.fff")
+        Dim f = GetDirectories(SAVE_PATH + "\!!!Backups", SearchOption.TopDirectoryOnly, {folder + "*"}).ToArray
+        If f.Count = 0 Then MsgBox("Directory not found. Was it deleted while zametker was running?") : Exit Sub
+        folder = f(0)
+
+    End Sub
+    'Menu Options/Backup/Delete
+    Private Sub backup_delete(sender As Object, e As EventArgs)
+        Dim o = DirectCast(sender, ToolStripMenuItem)
+        Dim folder = DateTime.Parse(o.OwnerItem.Text).ToString("yyyy-MM-dd HH.mm.ss.fff")
+        Dim f = GetDirectories(SAVE_PATH + "\!!!Backups", SearchOption.TopDirectoryOnly, {folder + "*"}).ToArray
+        If f.Count = 0 Then MsgBox("Directory not found. Was it deleted while zametker was running?") : Exit Sub
+        folder = f(0)
+
     End Sub
 #End Region
 
@@ -1932,6 +1986,36 @@ Public Class Form1
     Private Sub collapseAll() Handles ToolStripMenuItem20.Click
         TreeView1.CollapseAll()
     End Sub
+
+    'Text context menu
+    'reset font
+    Private Sub MenuItem_resetFont_Click(sender As Object, e As EventArgs) Handles MenuItem_resetFont.Click
+        Dim rtf = DirectCast(DirectCast(DirectCast(sender, ToolStripItem).Owner, ContextMenuStrip).SourceControl, RichTextBox)
+        If rtf.SelectionLength <= 0 Then Exit Sub
+
+        Dim f = rtf.SelectionFont
+        rtf.SelectionFont = New Font(New FontFamily("Microsoft Sans Serif"), CSng(ComboBox1.SelectedItem.ToString), New FontStyle)
+    End Sub
+    'reset color
+    Private Sub MenuItem_resetColors_Click(sender As Object, e As EventArgs) Handles MenuItem_resetColors.Click
+        Dim rtf = DirectCast(DirectCast(DirectCast(sender, ToolStripItem).Owner, ContextMenuStrip).SourceControl, RichTextBox)
+        If rtf.SelectionLength <= 0 Then Exit Sub
+
+        rtf.SelectionColor = Color.Black
+        rtf.SelectionBackColor = Color.White
+    End Sub
+    'set as password
+    Private Sub MenuItem_pass_Click(sender As Object, e As EventArgs) Handles MenuItem_pass.Click
+        Dim rtf = DirectCast(DirectCast(DirectCast(sender, ToolStripItem).Owner, ContextMenuStrip).SourceControl, RichTextBox)
+        If rtf.SelectionLength <= 0 Then Exit Sub
+
+        Dim f = rtf.SelectionFont
+        If f IsNot Nothing Then
+            rtf.SelectionFont = New Font(New FontFamily("Marlett"), f.Size, f.Style)
+        Else
+            rtf.SelectionFont = New Font(New FontFamily("Marlett"), CSng(ComboBox1.SelectedItem.ToString), New FontStyle)
+        End If
+    End Sub
 #End Region
 
 #Region "Table"
@@ -2045,6 +2129,7 @@ Public Class Form1
 #Region "Options"
     'Dbl click action
     Private Sub RadioButton1_CheckedChanged(sender As Object, e As EventArgs) Handles RadioButton1.CheckedChanged, RadioButton2.CheckedChanged
+        If refr Or Not loaded Then Exit Sub
         Dim r = DirectCast(sender, RadioButton)
         If r.Checked Then
             If RadioButton1.Checked Then ini.IniWriteValue("Main", "Dbl_click_on_tab", "OpenNew")
@@ -2053,14 +2138,17 @@ Public Class Form1
     End Sub
     'Default font size
     Private Sub ComboBox1_SelectedIndexChanged(sender As Object, e As EventArgs) Handles ComboBox1.SelectedIndexChanged
+        If refr Or Not loaded Then Exit Sub
         ini.IniWriteValue("Main", "Default_font_size", ComboBox1.SelectedItem.ToString)
     End Sub
     'Ask for page name when adding
     Private Sub CheckBox1_CheckedChanged(sender As Object, e As EventArgs) Handles CheckBox1.CheckedChanged
+        If refr Or Not loaded Then Exit Sub
         ini.IniWriteValue("Main", "Ask_for_page_name", CheckBox1.Checked.ToString)
     End Sub
     'order
     Private Sub RadioButton3_CheckedChanged(sender As Object, e As EventArgs) Handles RadioButton3.CheckedChanged, RadioButton4.CheckedChanged, RadioButton5.CheckedChanged
+        If refr Or Not loaded Then Exit Sub
         Dim r = DirectCast(sender, RadioButton)
         If r.Checked Then
             If RadioButton3.Checked Then ini.IniWriteValue("Main", "Note_Order", "Keep")
@@ -2070,6 +2158,7 @@ Public Class Form1
     End Sub
     'Use images
     Private Sub CheckBox2_CheckedChanged(sender As Object, e As EventArgs) Handles CheckBox2.CheckedChanged
+        If refr Or Not loaded Then Exit Sub
         If CheckBox2.Checked Then TreeView1.ImageList = ImageList1 Else TreeView1.ImageList = Nothing
         ini.IniWriteValue("Main", "Use_Images", CheckBox2.Checked.ToString)
     End Sub
@@ -2088,14 +2177,17 @@ Public Class Form1
     End Sub
     'Don't load all at startup
     Private Sub CheckBox3_CheckedChanged(sender As Object, e As EventArgs) Handles CheckBox3.CheckedChanged
+        If refr Or Not loaded Then Exit Sub
         ini.IniWriteValue("Main", "Not_Load_All", CheckBox3.Checked.ToString)
     End Sub
     'Delete confirmation
     Private Sub CheckBox4_CheckedChanged(sender As Object, e As EventArgs) Handles CheckBox4.CheckedChanged
+        If refr Or Not loaded Then Exit Sub
         ini.IniWriteValue("Main", "Delete_Confirm", CheckBox4.Checked.ToString)
     End Sub
     'Path change
     Private Sub TextBox1_TextChanged(sender As Object, e As EventArgs) Handles TextBox1.TextChanged
+        If refr Or Not loaded Then Exit Sub
         SAVE_PATH = TextBox1.Text.Trim
         ini.IniWriteValue("Main", "Notes_Path", TextBox1.Text.Trim)
     End Sub
@@ -2103,31 +2195,46 @@ Public Class Form1
     Private Sub RadioButton6_CheckedChanged(sender As Object, e As EventArgs) Handles RadioButton6.CheckedChanged, RadioButton7.CheckedChanged, RadioButton8.CheckedChanged
         Dim r = DirectCast(sender, RadioButton)
         If r.Checked Then
-            If RadioButton6.Checked Then ini.IniWriteValue("Main", "Brose_in_options", "left") : CheckBox5.Enabled = True
-            If RadioButton7.Checked Then ini.IniWriteValue("Main", "Brose_in_options", "right") : CheckBox5.Enabled = True
-            If RadioButton8.Checked Then ini.IniWriteValue("Main", "Brose_in_options", "replace") : CheckBox5.Enabled = False
+            If RadioButton6.Checked Then CheckBox5.Enabled = True
+            If RadioButton7.Checked Then CheckBox5.Enabled = True
+            If RadioButton8.Checked Then CheckBox5.Enabled = False
+        End If
+
+        If refr Or Not loaded Then Exit Sub
+        If r.Checked Then
+            If RadioButton6.Checked Then ini.IniWriteValue("Main", "Brose_in_options", "left")
+            If RadioButton7.Checked Then ini.IniWriteValue("Main", "Brose_in_options", "right")
+            If RadioButton8.Checked Then ini.IniWriteValue("Main", "Brose_in_options", "replace")
         End If
     End Sub
     'Browse in options - close options
     Private Sub CheckBox5_CheckedChanged(sender As Object, e As EventArgs) Handles CheckBox5.CheckedChanged
+        If refr Or Not loaded Then Exit Sub
         ini.IniWriteValue("Main", "Brose_in_options_close", CheckBox5.Checked.ToString)
     End Sub
     'Browse in search
     Private Sub RadioButton9_CheckedChanged(sender As Object, e As EventArgs) Handles RadioButton9.CheckedChanged, RadioButton10.CheckedChanged, RadioButton11.CheckedChanged
         Dim r = DirectCast(sender, RadioButton)
         If r.Checked Then
-            If RadioButton9.Checked Then ini.IniWriteValue("Main", "Brose_in_search", "left") : CheckBox6.Enabled = True
-            If RadioButton10.Checked Then ini.IniWriteValue("Main", "Brose_in_search", "right") : CheckBox6.Enabled = True
-            If RadioButton11.Checked Then ini.IniWriteValue("Main", "Brose_in_search", "replace") : CheckBox6.Enabled = False
+            If RadioButton9.Checked Then CheckBox6.Enabled = True
+            If RadioButton10.Checked Then CheckBox6.Enabled = True
+            If RadioButton11.Checked Then CheckBox6.Enabled = False
+        End If
+
+        If refr Or Not loaded Then Exit Sub
+        If r.Checked Then
+            If RadioButton9.Checked Then ini.IniWriteValue("Main", "Brose_in_search", "left")
+            If RadioButton10.Checked Then ini.IniWriteValue("Main", "Brose_in_search", "right")
+            If RadioButton11.Checked Then ini.IniWriteValue("Main", "Brose_in_search", "replace")
         End If
     End Sub
     'Browse in search - close search
     Private Sub CheckBox6_CheckedChanged(sender As Object, e As EventArgs) Handles CheckBox6.CheckedChanged
+        If refr Or Not loaded Then Exit Sub
         ini.IniWriteValue("Main", "Brose_in_search_close", CheckBox6.Checked.ToString)
     End Sub
     'Use color preset
     Private Sub CheckBox7_CheckedChanged(sender As Object, e As EventArgs) Handles CheckBox7.CheckedChanged
-        ini.IniWriteValue("Main", "Use_Color_Presets", CheckBox7.Checked.ToString)
         If CheckBox7.Checked Then
             If SetNoteForeColorToolStripMenuItem.DropDownItems.Count = 0 Then
                 For Each cName In colorArray
@@ -2158,15 +2265,20 @@ Public Class Form1
                 SetNoteBackColorToolStripMenuItem.Text = "Set Note BackColor ..."
             End If
         End If
+
+        If refr Or Not loaded Then Exit Sub
+        ini.IniWriteValue("Main", "Use_Color_Presets", CheckBox7.Checked.ToString)
     End Sub
     'Hot tracking
     Private Sub CheckBox8_CheckedChanged(sender As Object, e As EventArgs) Handles CheckBox8.CheckedChanged
+        If refr Or Not loaded Then Exit Sub
         ini.IniWriteValue("Main", "HotTrack", CheckBox8.Checked.ToString)
     End Sub
     'Focus rtf on tree click
     Private Sub CheckBox9_CheckedChanged(sender As Object, e As EventArgs) Handles CheckBox9.CheckedChanged
+        If refr Or Not loaded Then Exit Sub
         focusRtfNextTime = Nothing
-        ini.IniWriteValue("Main", "HotTrack", CheckBox9.Checked.ToString)
+        ini.IniWriteValue("Main", "Focus_RTF_on_tree_click", CheckBox9.Checked.ToString)
     End Sub
 #End Region
 
@@ -2300,5 +2412,6 @@ Public Class Form1
             draggedNode = Nothing
         End If
     End Sub
+
 #End Region
 End Class

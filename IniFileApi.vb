@@ -2,7 +2,7 @@
 Imports System.Text
 
 Public Class IniFileApi
-    Public path As String
+    Public path As String = ""
     <DllImport("kernel32.dll", SetLastError:=True)> Private Shared Function WritePrivateProfileString(ByVal lpAppName As String, ByVal lpKeyName As String, ByVal lpString As String, ByVal lpFileName As String) As Boolean
     End Function
     '<DllImport("kernel32.dll", SetLastError:=True)> Private Shared Function GetPrivateProfileString(ByVal lpAppName As String, ByVal lpKeyName As String, ByVal lpDefault As String, ByVal lpReturnedString As StringBuilder, ByVal nSize As Integer, ByVal lpFileName As String) As Integer
@@ -16,10 +16,12 @@ Public Class IniFileApi
     End Sub
 
     Public Sub IniWriteValue(Section As String, Key As String, Value As String)
+        If path = "" Then Exit Sub
         WritePrivateProfileString(Section, Key, Value, path)
     End Sub
 
     Public Function IniReadValue(Section As String, Key As String) As String
+        If path = "" Then Return ""
         'Dim temp As New StringBuilder(255)
         Dim temp As New String(" "c, 255)
         Dim i As Integer = GetPrivateProfileString(Section, Key, "", temp, 255, path)
@@ -37,6 +39,8 @@ Public Class IniFileApi
     End Function
 
     Public Function IniListKey(Optional section As String = Nothing) As String()
+        If path = "" Then Return Nothing
+
         Dim temp As New String(" "c, 4096)
         Dim i As Integer = GetPrivateProfileString(section, Nothing, "", temp, 4096, path)
         Dim l As List(Of String) = temp.Split(Chr(0)).ToList

@@ -5,6 +5,7 @@
     Public tray_start As Boolean = False
     Public main_class = New Main()
     Public loading_start As Date
+    Public load_time As String
 
     'Version 1
     '

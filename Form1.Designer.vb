@@ -186,9 +186,12 @@ Partial Class Form1
         Me.ToolStripMenuItem19 = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripMenuItem20 = New System.Windows.Forms.ToolStripMenuItem()
         Me.ContextMenu_text = New System.Windows.Forms.ContextMenuStrip(Me.components)
-        Me.MenuItem_pass = New System.Windows.Forms.ToolStripMenuItem()
-        Me.MenuItem_resetColors = New System.Windows.Forms.ToolStripMenuItem()
         Me.MenuItem_resetFont = New System.Windows.Forms.ToolStripMenuItem()
+        Me.MenuItem_resetColors = New System.Windows.Forms.ToolStripMenuItem()
+        Me.MenuItem_pass = New System.Windows.Forms.ToolStripMenuItem()
+        Me.RestoreFromBackupToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.CompareWithcurrentToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripSeparator10 = New System.Windows.Forms.ToolStripSeparator()
         Me.TabControl1.SuspendLayout()
         Me.TabPageOptions.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
@@ -1488,106 +1491,106 @@ Partial Class Form1
         '
         'ContextMenu_treeNode
         '
-        Me.ContextMenu_treeNode.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.OpenInNewTabToolStripMenuItem, Me.OpenAllChildrenToolStripMenuItem, Me.ToolStripMenuItem4, Me.AddToolStripMenuItem, Me.AddChildToolStripMenuItem, Me.CloneToolStripMenuItem, Me.RenameToolStripMenuItem, Me.DeleteToolStripMenuItem, Me.CopyAsFileToolStripMenuItem, Me.ToolStripMenuItem17, Me.SortChildrensToolStripMenuItem, Me.ToolStripMenuItem2, Me.SetNoteForeColorToolStripMenuItem, Me.SetNoteBackColorToolStripMenuItem, Me.SetCustomIconToolStripMenuItem, Me.ToolStripMenuItem3, Me.PastAsNewNoteToolStripMenuItem})
+        Me.ContextMenu_treeNode.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.RestoreFromBackupToolStripMenuItem, Me.CompareWithcurrentToolStripMenuItem, Me.ToolStripSeparator10, Me.OpenInNewTabToolStripMenuItem, Me.OpenAllChildrenToolStripMenuItem, Me.ToolStripMenuItem4, Me.AddToolStripMenuItem, Me.AddChildToolStripMenuItem, Me.CloneToolStripMenuItem, Me.RenameToolStripMenuItem, Me.DeleteToolStripMenuItem, Me.CopyAsFileToolStripMenuItem, Me.ToolStripMenuItem17, Me.SortChildrensToolStripMenuItem, Me.ToolStripMenuItem2, Me.SetNoteForeColorToolStripMenuItem, Me.SetNoteBackColorToolStripMenuItem, Me.SetCustomIconToolStripMenuItem, Me.ToolStripMenuItem3, Me.PastAsNewNoteToolStripMenuItem})
         Me.ContextMenu_treeNode.Name = "ContextMenuStrip1"
-        Me.ContextMenu_treeNode.Size = New System.Drawing.Size(177, 314)
+        Me.ContextMenu_treeNode.Size = New System.Drawing.Size(191, 364)
         '
         'OpenInNewTabToolStripMenuItem
         '
         Me.OpenInNewTabToolStripMenuItem.Name = "OpenInNewTabToolStripMenuItem"
-        Me.OpenInNewTabToolStripMenuItem.Size = New System.Drawing.Size(176, 22)
+        Me.OpenInNewTabToolStripMenuItem.Size = New System.Drawing.Size(187, 22)
         Me.OpenInNewTabToolStripMenuItem.Text = "Open in new tab"
         '
         'OpenAllChildrenToolStripMenuItem
         '
         Me.OpenAllChildrenToolStripMenuItem.Name = "OpenAllChildrenToolStripMenuItem"
-        Me.OpenAllChildrenToolStripMenuItem.Size = New System.Drawing.Size(176, 22)
+        Me.OpenAllChildrenToolStripMenuItem.Size = New System.Drawing.Size(187, 22)
         Me.OpenAllChildrenToolStripMenuItem.Text = "Open all children"
         '
         'ToolStripMenuItem4
         '
         Me.ToolStripMenuItem4.Name = "ToolStripMenuItem4"
-        Me.ToolStripMenuItem4.Size = New System.Drawing.Size(173, 6)
+        Me.ToolStripMenuItem4.Size = New System.Drawing.Size(184, 6)
         '
         'AddToolStripMenuItem
         '
         Me.AddToolStripMenuItem.Name = "AddToolStripMenuItem"
-        Me.AddToolStripMenuItem.Size = New System.Drawing.Size(176, 22)
+        Me.AddToolStripMenuItem.Size = New System.Drawing.Size(187, 22)
         Me.AddToolStripMenuItem.Text = "Add"
         '
         'AddChildToolStripMenuItem
         '
         Me.AddChildToolStripMenuItem.Name = "AddChildToolStripMenuItem"
-        Me.AddChildToolStripMenuItem.Size = New System.Drawing.Size(176, 22)
+        Me.AddChildToolStripMenuItem.Size = New System.Drawing.Size(187, 22)
         Me.AddChildToolStripMenuItem.Text = "Add Child"
         '
         'CloneToolStripMenuItem
         '
         Me.CloneToolStripMenuItem.Name = "CloneToolStripMenuItem"
-        Me.CloneToolStripMenuItem.Size = New System.Drawing.Size(176, 22)
+        Me.CloneToolStripMenuItem.Size = New System.Drawing.Size(187, 22)
         Me.CloneToolStripMenuItem.Text = "Clone"
         '
         'RenameToolStripMenuItem
         '
         Me.RenameToolStripMenuItem.Name = "RenameToolStripMenuItem"
-        Me.RenameToolStripMenuItem.Size = New System.Drawing.Size(176, 22)
+        Me.RenameToolStripMenuItem.Size = New System.Drawing.Size(187, 22)
         Me.RenameToolStripMenuItem.Text = "Rename"
         '
         'DeleteToolStripMenuItem
         '
         Me.DeleteToolStripMenuItem.Name = "DeleteToolStripMenuItem"
-        Me.DeleteToolStripMenuItem.Size = New System.Drawing.Size(176, 22)
+        Me.DeleteToolStripMenuItem.Size = New System.Drawing.Size(187, 22)
         Me.DeleteToolStripMenuItem.Text = "Delete"
         '
         'CopyAsFileToolStripMenuItem
         '
         Me.CopyAsFileToolStripMenuItem.Name = "CopyAsFileToolStripMenuItem"
-        Me.CopyAsFileToolStripMenuItem.Size = New System.Drawing.Size(176, 22)
+        Me.CopyAsFileToolStripMenuItem.Size = New System.Drawing.Size(187, 22)
         Me.CopyAsFileToolStripMenuItem.Text = "Copy as File"
         '
         'ToolStripMenuItem17
         '
         Me.ToolStripMenuItem17.Name = "ToolStripMenuItem17"
-        Me.ToolStripMenuItem17.Size = New System.Drawing.Size(173, 6)
+        Me.ToolStripMenuItem17.Size = New System.Drawing.Size(184, 6)
         '
         'SortChildrensToolStripMenuItem
         '
         Me.SortChildrensToolStripMenuItem.Name = "SortChildrensToolStripMenuItem"
-        Me.SortChildrensToolStripMenuItem.Size = New System.Drawing.Size(176, 22)
+        Me.SortChildrensToolStripMenuItem.Size = New System.Drawing.Size(187, 22)
         Me.SortChildrensToolStripMenuItem.Text = "Sort Childrens"
         '
         'ToolStripMenuItem2
         '
         Me.ToolStripMenuItem2.Name = "ToolStripMenuItem2"
-        Me.ToolStripMenuItem2.Size = New System.Drawing.Size(173, 6)
+        Me.ToolStripMenuItem2.Size = New System.Drawing.Size(184, 6)
         '
         'SetNoteForeColorToolStripMenuItem
         '
         Me.SetNoteForeColorToolStripMenuItem.Name = "SetNoteForeColorToolStripMenuItem"
-        Me.SetNoteForeColorToolStripMenuItem.Size = New System.Drawing.Size(176, 22)
+        Me.SetNoteForeColorToolStripMenuItem.Size = New System.Drawing.Size(187, 22)
         Me.SetNoteForeColorToolStripMenuItem.Text = "Set Note ForeColor"
         '
         'SetNoteBackColorToolStripMenuItem
         '
         Me.SetNoteBackColorToolStripMenuItem.Name = "SetNoteBackColorToolStripMenuItem"
-        Me.SetNoteBackColorToolStripMenuItem.Size = New System.Drawing.Size(176, 22)
+        Me.SetNoteBackColorToolStripMenuItem.Size = New System.Drawing.Size(187, 22)
         Me.SetNoteBackColorToolStripMenuItem.Text = "Set Note BackColor"
         '
         'SetCustomIconToolStripMenuItem
         '
         Me.SetCustomIconToolStripMenuItem.Name = "SetCustomIconToolStripMenuItem"
-        Me.SetCustomIconToolStripMenuItem.Size = New System.Drawing.Size(176, 22)
+        Me.SetCustomIconToolStripMenuItem.Size = New System.Drawing.Size(187, 22)
         Me.SetCustomIconToolStripMenuItem.Text = "Set Custom Icon ..."
         '
         'ToolStripMenuItem3
         '
         Me.ToolStripMenuItem3.Name = "ToolStripMenuItem3"
-        Me.ToolStripMenuItem3.Size = New System.Drawing.Size(173, 6)
+        Me.ToolStripMenuItem3.Size = New System.Drawing.Size(184, 6)
         '
         'PastAsNewNoteToolStripMenuItem
         '
         Me.PastAsNewNoteToolStripMenuItem.Name = "PastAsNewNoteToolStripMenuItem"
-        Me.PastAsNewNoteToolStripMenuItem.Size = New System.Drawing.Size(176, 22)
+        Me.PastAsNewNoteToolStripMenuItem.Size = New System.Drawing.Size(187, 22)
         Me.PastAsNewNoteToolStripMenuItem.Text = "Past as new note"
         '
         'ContextMenu_tree
@@ -1614,11 +1617,11 @@ Partial Class Form1
         Me.ContextMenu_text.Name = "ContextMenu_text"
         Me.ContextMenu_text.Size = New System.Drawing.Size(158, 70)
         '
-        'MenuItem_pass
+        'MenuItem_resetFont
         '
-        Me.MenuItem_pass.Name = "MenuItem_pass"
-        Me.MenuItem_pass.Size = New System.Drawing.Size(157, 22)
-        Me.MenuItem_pass.Text = "Set as password"
+        Me.MenuItem_resetFont.Name = "MenuItem_resetFont"
+        Me.MenuItem_resetFont.Size = New System.Drawing.Size(157, 22)
+        Me.MenuItem_resetFont.Text = "Reset Font"
         '
         'MenuItem_resetColors
         '
@@ -1626,11 +1629,31 @@ Partial Class Form1
         Me.MenuItem_resetColors.Size = New System.Drawing.Size(157, 22)
         Me.MenuItem_resetColors.Text = "Reset colors"
         '
-        'MenuItem_resetFont
+        'MenuItem_pass
         '
-        Me.MenuItem_resetFont.Name = "MenuItem_resetFont"
-        Me.MenuItem_resetFont.Size = New System.Drawing.Size(157, 22)
-        Me.MenuItem_resetFont.Text = "Reset Font"
+        Me.MenuItem_pass.Name = "MenuItem_pass"
+        Me.MenuItem_pass.Size = New System.Drawing.Size(157, 22)
+        Me.MenuItem_pass.Text = "Set as password"
+        '
+        'RestoreFromBackupToolStripMenuItem
+        '
+        Me.RestoreFromBackupToolStripMenuItem.Name = "RestoreFromBackupToolStripMenuItem"
+        Me.RestoreFromBackupToolStripMenuItem.Size = New System.Drawing.Size(190, 22)
+        Me.RestoreFromBackupToolStripMenuItem.Text = "Restore from backup"
+        Me.RestoreFromBackupToolStripMenuItem.Visible = False
+        '
+        'CompareWithcurrentToolStripMenuItem
+        '
+        Me.CompareWithcurrentToolStripMenuItem.Name = "CompareWithcurrentToolStripMenuItem"
+        Me.CompareWithcurrentToolStripMenuItem.Size = New System.Drawing.Size(190, 22)
+        Me.CompareWithcurrentToolStripMenuItem.Text = "Compare with current"
+        Me.CompareWithcurrentToolStripMenuItem.Visible = False
+        '
+        'ToolStripSeparator10
+        '
+        Me.ToolStripSeparator10.Name = "ToolStripSeparator10"
+        Me.ToolStripSeparator10.Size = New System.Drawing.Size(187, 6)
+        Me.ToolStripSeparator10.Visible = False
         '
         'Form1
         '
@@ -1839,4 +1862,7 @@ Partial Class Form1
     Friend WithEvents MenuItem_resetFont As ToolStripMenuItem
     Friend WithEvents MenuItem_resetColors As ToolStripMenuItem
     Friend WithEvents MenuItem_pass As ToolStripMenuItem
+    Friend WithEvents RestoreFromBackupToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents CompareWithcurrentToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents ToolStripSeparator10 As ToolStripSeparator
 End Class
