@@ -8,11 +8,11 @@ Imports System.Runtime.InteropServices
 
 ' Review the values of the assembly attributes
 
-<Assembly: AssemblyTitle("AlphaNotePad_v2")>
+<Assembly: AssemblyTitle("ZametkeR")>
 <Assembly: AssemblyDescription("")>
-<Assembly: AssemblyCompany("Microsoft")>
-<Assembly: AssemblyProduct("AlphaNotePad_v2")>
-<Assembly: AssemblyCopyright("Copyright © Microsoft 2016")>
+<Assembly: AssemblyCompany("Gyga Development")>
+<Assembly: AssemblyProduct("ZametkeR")>
+<Assembly: AssemblyCopyright("Copyright © Gyga Development 2016")>
 <Assembly: AssemblyTrademark("")>
 
 <Assembly: ComVisible(False)>
@@ -31,5 +31,5 @@ Imports System.Runtime.InteropServices
 ' by using the '*' as shown below:
 ' <Assembly: AssemblyVersion("1.0.*")> 
 
-<Assembly: AssemblyVersion("0.9.4.6118")>
-<Assembly: AssemblyFileVersion("0.9.4.6118")>
+<Assembly: AssemblyVersion("0.9.5.6295")>
+<Assembly: AssemblyFileVersion("0.9.5.6295")>

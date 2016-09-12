@@ -12,24 +12,31 @@ Public Class Form1
     Dim loaded As Boolean = False
     Dim order As New List(Of String)
     Dim crypt As New Cryptography("xus.ebr#usp//4u(hec*aT#hucharuzAC$cru")
-    Dim reminders As New Reminders
     Dim content As New Dictionary(Of TreeNode, String)
     Dim content_bgcolor As New Dictionary(Of TreeNode, Color)
+    Dim content_notSaved As New List(Of TreeNode)
     Dim content_needCrypt As New List(Of TreeNode)
     Dim content_associatedNodes As New Dictionary(Of RichTextBox, TreeNode)
+    Dim reminders As New Reminders
+    Dim remindersText As String = ""
+    Dim remindersAstralisText As String = ""
     Dim optionsTabPage As TabPage
     Dim lastChangedTab As TabPage = Nothing
     Dim lastOverwritenNode As TreeNode = Nothing
-    Dim remindersText As String = ""
-    Dim remindersAstralisText As String = ""
     Dim SAVE_PATH_START As String = ""
     Dim colorArray = {"Red", "Blue", "Green", "Yellow", "Orange", "White", "Black", "Aqua", "Magenta", "Custom ..."}
     Dim focusRtfNextTime As RichTextBox = Nothing
     Dim backupNode As TreeNode = Nothing
+    Dim aalt As Boolean = False
+    Dim ctrl As Boolean = False
+    Dim shift As Boolean = False
 
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         refr = True
         loaded = True
+
+        Button2.Parent = TrackBar1 : Button2.Left = 5 : Button2.Top = 25
+
         optionsTabPage = TabControl1.TabPages(0)
         TabControl1.TabPages.Remove(optionsTabPage)
         For Each Font As FontFamily In System.Drawing.FontFamily.Families
@@ -125,9 +132,11 @@ Public Class Form1
         t = ini.IniReadValue("Main", "Focus_RTF_on_tree_click")
         If t <> "0" And t.ToUpper <> "FALSE" And t <> "" Then CheckBox9.Checked = True
 
-        refr = False
-        If DirectoryExists(SAVE_PATH) Then load_recursively()
-        If Not CheckBox2.Checked Then TreeView1.ImageList = Nothing
+        t = ini.IniReadValue("Main", "Save_tree_state")
+        If t <> "0" And t.ToUpper <> "FALSE" And t <> "" Then CheckBox11.Checked = True
+
+        Dim rkz = Microsoft.Win32.Registry.CurrentUser.OpenSubKey("SOFTWARE\Microsoft\Windows\CurrentVersion\Run", True).GetValue("ZametkeR")
+        If rkz IsNot Nothing AndAlso rkz <> "" Then CheckBox10.Checked = True Else CheckBox10.Checked = False
 
         'Add backups menu items
         If DirectoryExists(SAVE_PATH + "\!!!Backups") Then
@@ -142,10 +151,15 @@ Public Class Form1
                 AddHandler tmp.Click, AddressOf backup_restore
                 tmp = i.DropDownItems.Add("Restore Full")
                 AddHandler tmp.Click, AddressOf backup_restore_full
-                tmp = i.DropDownItems.Add("Restore Delete")
+                tmp = i.DropDownItems.Add("Delete")
                 AddHandler tmp.Click, AddressOf backup_delete
             Next
         End If
+
+        'Load notes
+        refr = False
+        If DirectoryExists(SAVE_PATH) Then load_recursively()
+        If Not CheckBox2.Checked Then TreeView1.ImageList = Nothing
 
         If load_time Is Nothing OrElse load_time = "" Then
             Dim d = DateTime.Now - loading_start
@@ -174,13 +188,28 @@ Public Class Form1
 
     'Load notes
     Private Sub load_recursively()
+        content.Clear()
+        content_bgcolor.Clear()
+        content_notSaved.Clear()
+        content_needCrypt.Clear()
+        content_associatedNodes.Clear()
+        lastChangedTab = Nothing
+        lastOverwritenNode = Nothing
+        focusRtfNextTime = Nothing
+        backupNode = Nothing
+        reminders = New Reminders
+        remindersText = ""
+        remindersAstralisText = ""
+        Dim node_to_select As String = ""
+        Dim nodes_to_expand As New List(Of String)
+
         Dim dir_root = GetDirectoryInfo(SAVE_PATH).FullName
         If Not dir_root.EndsWith("\") Then dir_root = dir_root + "\"
 
         Dim files = GetFiles(SAVE_PATH, FileIO.SearchOption.SearchAllSubDirectories, {"*.zam"}).ToList
-        For i As Integer = files.Count - 1 To 0 Step -1
-            'If files(i).ToUpper.Contains("!!!BACKUPS") Then files.RemoveAt(i)
-        Next
+        'For i As Integer = files.Count - 1 To 0 Step -1
+        '    'If files(i).ToUpper.Contains("!!!BACKUPS") Then files.RemoveAt(i)
+        'Next
         If RadioButton3.Checked Or RadioButton4.Checked Then files.Sort()
 
         'ORDER
@@ -189,7 +218,11 @@ Public Class Form1
 
             Dim rdr As New StreamReader(SAVE_PATH + "\!order.ord")
             Do While Not rdr.EndOfStream
-                order.Add(rdr.ReadLine)
+                Dim t = rdr.ReadLine
+                Dim t2 = t.Replace("%SELECTED%", "").Replace("%EXPANDED%", "").Trim
+                If t.ToUpper.Contains("%SELECTED%") Then node_to_select = t2.ToUpper
+                If t.ToUpper.Contains("%EXPANDED%") Then nodes_to_expand.Add(t2.ToUpper)
+                order.Add(t2)
             Loop
             rdr.Close()
 
@@ -220,10 +253,6 @@ Public Class Form1
             Dim dir_rel = dir.Substring(dir_root.Length).Trim
             If Not dir_rel.EndsWith("\") Then dir_rel = dir_rel + "\"
 
-            If fnameNoExt = "Заметки ВК" Then
-                f = f
-            End If
-
             If dir_rel = "\" Then
                 node = TreeView1.Nodes.Add(fnameNoExt, fnameNoExt) : content.Add(node, "") : node.ImageIndex = 3 : node.SelectedImageIndex = 3
             Else
@@ -245,6 +274,7 @@ Public Class Form1
 
             Dim isReminder As Boolean = node.Text.ToUpper = "REMINDERS"
             isReminder = isReminder Or (node.Parent IsNot Nothing AndAlso node.Parent.Text.ToUpper = "REMINDERS")
+            isReminder = isReminder And Not node.FullPath.ToUpper.StartsWith("!!!BACKUPS")
             If CheckBox3.Checked And Not isReminder Then
                 content(node) = "{%%%UNLOADED%%%}"
             Else
@@ -281,17 +311,27 @@ Public Class Form1
 
             'custom icon
             If FileExists(dir + fnameNoExt + ".png") Then
-                Dim image = Bitmap.FromFile(dir + fnameNoExt + ".png")
-                ImageList1.Images.Add(dir + fnameNoExt + ".png", image)
+                Dim img = Image.FromFile(dir + fnameNoExt + ".png")
+                ImageList1.Images.Add(dir + fnameNoExt + ".png", img)
+                img.Dispose()
+
                 node.ImageKey = dir + fnameNoExt + ".png"
                 node.SelectedImageKey = dir + fnameNoExt + ".png"
+            End If
+        Next
+
+        'expand nodes
+        For Each n In nodeIterator(TreeView1.Nodes)
+            If nodes_to_expand.Contains(n.FullPath.ToUpper) Then n.Expand()
+            If node_to_select = n.FullPath.ToUpper Then
+                TreeView1.SelectedNode = n
             End If
         Next
 
         backupNode = TreeView1.Nodes("!!!BACKUPS")
         If backupNode IsNot Nothing Then backupNode.Remove()
 
-        If TreeView1.Nodes.Count > 0 Then TreeView1.SelectedNode = TreeView1.Nodes(0)
+        If TreeView1.Nodes.Count > 0 AndAlso TreeView1.SelectedNode Is Nothing Then TreeView1.SelectedNode = TreeView1.Nodes(0)
     End Sub
     Private Function load_content(f As String, node As TreeNode) As String
         Dim w As New StreamReader(f)
@@ -398,9 +438,35 @@ Public Class Form1
             ToolStripButton26.ToolTipText = remindersText.Trim + vbCrLf + vbCrLf + remindersAstralisText.Trim
         End If
     End Sub
+    Private Iterator Function nodeIterator(nodes As TreeNodeCollection) As IEnumerable(Of TreeNode)
+        For Each node As TreeNode In nodes
+            Yield node
+
+            For Each child In nodeIterator(node.Nodes)
+                Yield child
+            Next
+        Next
+    End Function
+
 
     'Hotkeys
     Private Sub Form1_KeyDown(sender As Object, e As KeyEventArgs) Handles Me.KeyDown
+        If e.Alt Then aalt = True
+        If e.Shift Then shift = True
+        If e.Control Then
+            ctrl = True
+            Dim t = TabControl1.SelectedTab
+            If t IsNot Nothing AndAlso t IsNot optionsTabPage Then
+                TrackBar1.Parent = t
+                TrackBar1.Left = t.Width - 230
+                TrackBar1.Top = t.Height - 45
+                TrackBar1.BringToFront()
+                TrackBar1.Visible = True
+                'Button2.Visible = True
+                'Button2.BringToFront()
+            End If
+        End If
+
         If e.Alt And Not e.Control And e.KeyCode = Keys.A Then ToolStripButton2_Click(ToolStripButton2, New EventArgs)
         If e.Control And e.Alt And e.KeyCode = Keys.A Then ToolStripButton3_Click(ToolStripButton3, New EventArgs)
         If e.Control And e.Alt And e.KeyCode = Keys.D Then ToolStripButton4_Click(ToolStripButton4, New EventArgs)
@@ -410,6 +476,11 @@ Public Class Form1
         If e.Control And e.KeyCode = Keys.B Then ToolStripButton8_Click(ToolStripButton8, New EventArgs)
         If e.Control And e.KeyCode = Keys.I Then ToolStripButton9_Click(ToolStripButton9, New EventArgs)
         If e.Control And e.KeyCode = Keys.U Then ToolStripButton10_Click(ToolStripButton10, New EventArgs)
+    End Sub
+    Private Sub Form1_KeyUp(sender As Object, e As KeyEventArgs) Handles Me.KeyUp
+        If e.KeyCode = Keys.Menu Then aalt = False
+        If e.KeyCode = Keys.ShiftKey Then shift = False
+        If e.KeyCode = Keys.ControlKey Then ctrl = False : TrackBar1.Visible = False
     End Sub
 
     'Treeview selected change - add or update tab page
@@ -570,6 +641,8 @@ Public Class Form1
             If FileExists(f) Then content(node) = load_content(f, node)
         End If
 
+        If content_notSaved.Contains(node) Then tabpage.Text += "*"
+
         'If content is empty, set default font size
         If content(node).Trim = "" Or Not content(node).ToUpper.StartsWith("{\RTF") Then
             Dim f = rtf.Font
@@ -608,6 +681,7 @@ Public Class Form1
         AddHandler rtf.MouseMove, AddressOf rtf_mouseMove
         AddHandler rtf.MouseLeave, AddressOf rtf_mouseOut
         AddHandler rtf.MouseClick, AddressOf rtf_mouseClick
+        AddHandler rtf.MouseWheel, AddressOf rtf_MouseWheel
         rtf.ContextMenuStrip = ContextMenu_text
         rtf.Dock = DockStyle.Fill
         rtf.HideSelection = False
@@ -635,6 +709,9 @@ Public Class Form1
         Dim rtf = DirectCast(sender, RichTextBox)
         Dim node = content_associatedNodes(rtf)
         content(node) = rtf.Rtf
+        If Not Me.Text.EndsWith("*") Then Me.Text += "*"
+        If Not rtf.Parent.Text.EndsWith("*") Then rtf.Parent.Text += "*"
+        If Not content_notSaved.Contains(node) Then content_notSaved.Add(node)
 
         'reminder check - My format
         If node.Text.ToUpper = "REMINDERS" Then
@@ -663,7 +740,7 @@ Public Class Form1
             Dim substr = txt.Substring(w_str1, w_end1 - w_str1).Trim.ToUpper
             If substr = "{SPOILER}" Or substr = "{%SPOILER%}" Then Cursor = Cursors.Hand Else Cursor = Cursors.IBeam
         Else
-            Cursor = Cursors.Default
+            Cursor = Cursors.IBeam
         End If
 
         If rtf.SelectionType = RichTextBoxSelectionTypes.Object AndAlso rtf.SelectionLength = 1 Then
@@ -733,6 +810,41 @@ Public Class Form1
                 rtf.Select(w_end1 - 1, txt.IndexOf("}", w_end1) - (w_end1 - 1))
                 rtf.SelectedText = ""
             End If
+        End If
+    End Sub
+    'Handle page width ctrl+alt+wheel
+    Private Sub rtf_MouseWheel(sender As Object, e As MouseEventArgs)
+        Dim d = e.Delta
+        If shift And d <> 0 Then
+            d = -d
+            Dim rtf = DirectCast(sender, RichTextBox)
+            Dim p = rtf.Parent.Padding.Left
+            p = (p + d / 4)
+            If p < 0 Then p = 0
+            If p > 270 Then p = 270
+            rtf.Parent.Padding = New Padding(p, 0, p, 0)
+        End If
+        If ctrl Then
+            Dim rtf = DirectCast(sender, RichTextBox)
+            TrackBar1.Value = rtf.ZoomFactor * 10
+        End If
+    End Sub
+    'RTF Zoom
+    Private Sub TrackBar1_ValueChanged(sender As Object, e As EventArgs) Handles TrackBar1.ValueChanged
+        If Not loaded Then Exit Sub
+        Dim t = TabControl1.SelectedTab
+        If t IsNot Nothing AndAlso t IsNot optionsTabPage Then
+            Dim rtf = t.Controls.OfType(Of RichTextBox).First
+            rtf.ZoomFactor = TrackBar1.Value / 10
+        End If
+    End Sub
+    'Set zoom 100%
+    Private Sub Button2_Click(sender As Object, e As EventArgs) Handles Button2.Click
+        Dim t = TabControl1.SelectedTab
+        If t IsNot Nothing AndAlso t IsNot optionsTabPage Then
+            'Dim rtf = t.Controls.OfType(Of RichTextBox).First
+            'rtf.ZoomFactor = 1
+            TrackBar1.Value = 10
         End If
     End Sub
 
@@ -815,7 +927,6 @@ Public Class Form1
         End If
         refr = False
     End Sub
-
 
     'Add page
     Private Sub ToolStripButton2_Click(sender As Object, e As EventArgs, Optional new_name As String = "", Optional _content As String = "") Handles ToolStripButton2.Click
@@ -914,9 +1025,12 @@ Public Class Form1
             removeRecursively(sub_node)
         Next
 
-        Dim path = SAVE_PATH + "\" + node.FullPath
-        If FileExists(path + ".zam") Then DeleteFile(path + ".zam")
-        If DirectoryExists(path) Then DeleteDirectory(path, FileIO.DeleteDirectoryOption.DeleteAllContents)
+        Dim f_path = SAVE_PATH + "\" + node.FullPath
+        'If FileExists(f_path + ".zam") Then DeleteFile(f_path + ".zam")
+        For Each file In GetFiles(Path.GetDirectoryName(f_path + ".zam"), FileIO.SearchOption.SearchTopLevelOnly, {node.Text + ".*"})
+            DeleteFile(file)
+        Next
+        If DirectoryExists(f_path) Then DeleteDirectory(f_path, FileIO.DeleteDirectoryOption.DeleteAllContents)
 
         Dim tabPagesToRemove As New List(Of TabPage)
         For Each tabPage As TabPage In TabControl1.TabPages
@@ -1094,6 +1208,12 @@ Public Class Form1
         Dim t = DateTime.Now
         ToolStripButton22.Visible = True : Me.Refresh()
         order.Clear()
+        content_notSaved.Clear()
+        If Me.Text.EndsWith("*") Then Me.Text = Me.Text.Substring(0, Me.Text.Length - 1)
+        For Each tab As TabPage In TabControl1.TabPages
+            If tab.Text.EndsWith("*") Then tab.Text = tab.Text.Substring(0, tab.Text.Length - 1)
+        Next
+
         If Not DirectoryExists(SAVE_PATH) Then CreateDirectory(SAVE_PATH)
         Dim forceResaveAll As Boolean = False
         If SAVE_PATH <> SAVE_PATH_START Then forceResaveAll = True
@@ -1111,13 +1231,16 @@ Public Class Form1
         ToolStripButton22.Visible = False
 
         Dim t2 = DateTime.Now - t
-        'Label7.Text = "Last save time: " + t2.Seconds.ToString + "." + t2.Milliseconds.ToString + " seconds"
         Label7.Text = "Last save time: " + Math.Round(t2.TotalSeconds, 3).ToString + " seconds"
     End Sub
     Private Sub saveNodeRecursively(node As TreeNode, Optional forceResaveAll As Boolean = False)
         Dim dir = ""
         Dim p = node.FullPath
         If p.ToUpper.StartsWith("!!!BACKUPS") Then Exit Sub
+        If CheckBox11.Checked Then
+            If node.IsExpanded Then p = p + "%EXPANDED%"
+            If node.IsSelected Then p = p + "%SELECTED%"
+        End If
         order.Add(p)
         If p.Contains("\") Then dir = p.Substring(0, p.LastIndexOf("\"))
         If Not DirectoryExists(SAVE_PATH + "\" + dir) Then CreateDirectory(SAVE_PATH + "\" + dir)
@@ -1171,6 +1294,23 @@ Public Class Form1
         For Each node_sub As TreeNode In node.Nodes
             saveNodeRecursively(node_sub, forceResaveAll)
         Next
+    End Sub
+
+    'Collapse tree
+    Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
+        If Button1.Text = "<<" Then
+            Button1.Text = ">>"
+            TreeView1.Visible = False
+            ToolStrip2.Visible = False
+            SplitContainer1.SplitterDistance = 25
+            SplitContainer1.IsSplitterFixed = True
+        Else
+            Button1.Text = "<<"
+            TreeView1.Visible = True
+            ToolStrip2.Visible = True
+            SplitContainer1.SplitterDistance = 250
+            SplitContainer1.IsSplitterFixed = False
+        End If
     End Sub
 
 #Region "Toolbar"
@@ -1792,7 +1932,7 @@ Public Class Form1
         AddHandler tmp.Click, AddressOf backup_restore
         tmp = i.DropDownItems.Add("Restore Full")
         AddHandler tmp.Click, AddressOf backup_restore_full
-        tmp = i.DropDownItems.Add("Restore Delete")
+        tmp = i.DropDownItems.Add("Delete")
         AddHandler tmp.Click, AddressOf backup_delete
     End Sub
     'Menu Options/Backup/Show backups in tree
@@ -1807,29 +1947,87 @@ Public Class Form1
     'Menu Options/Backup/Restore overwirte
     Private Sub backup_restore(sender As Object, e As EventArgs)
         Dim o = DirectCast(sender, ToolStripMenuItem)
-        Dim folder = DateTime.Parse(o.OwnerItem.Text).ToString("yyyy-MM-dd HH.mm.ss.fff")
-        Dim f = GetDirectories(SAVE_PATH + "\!!!Backups", SearchOption.TopDirectoryOnly, {folder + "*"}).ToArray
+        Dim folder = DateTime.Parse(o.OwnerItem.Text).ToString("yyyy-MM-dd HH.mm.ss")
+        Dim f = GetDirectories(SAVE_PATH + "\!!!Backups", FileIO.SearchOption.SearchTopLevelOnly, {folder + ".*"}).ToArray
         If f.Count = 0 Then MsgBox("Directory not found. Was it deleted while zametker was running?") : Exit Sub
-        folder = f(0)
 
+        If MsgBox("Are you sure to overwrite your notes from " + f(0), MsgBoxStyle.YesNo) = MsgBoxResult.No Then Exit Sub
+
+        TabControl1.TabPages.Clear()
+        TreeView1.Nodes.Clear()
+        If backupNode IsNot Nothing Then backupNode = Nothing
+
+        For Each file In GetFiles(f(0))
+            Dim fileName = Path.GetFileName(file)
+            FileIO.FileSystem.CopyFile(file, SAVE_PATH + "\" + fileName, True)
+        Next
+        For Each d In GetDirectories(f(0))
+            FileIO.FileSystem.CopyDirectory(d, SAVE_PATH + "\" + d.Substring(d.LastIndexOf("\") + 1), True)
+        Next
+
+        load_recursively()
     End Sub
     'Menu Options/Backup/Restore full
     Private Sub backup_restore_full(sender As Object, e As EventArgs)
         Dim o = DirectCast(sender, ToolStripMenuItem)
-        Dim folder = DateTime.Parse(o.OwnerItem.Text).ToString("yyyy-MM-dd HH.mm.ss.fff")
-        Dim f = GetDirectories(SAVE_PATH + "\!!!Backups", SearchOption.TopDirectoryOnly, {folder + "*"}).ToArray
+        Dim folder = DateTime.Parse(o.OwnerItem.Text).ToString("yyyy-MM-dd HH.mm.ss")
+        Dim f = GetDirectories(SAVE_PATH + "\!!!Backups", FileIO.SearchOption.SearchTopLevelOnly, {folder + ".*"}).ToArray
         If f.Count = 0 Then MsgBox("Directory not found. Was it deleted while zametker was running?") : Exit Sub
-        folder = f(0)
 
+        If MsgBox("Are you sure to restore your notes from " + f(0), MsgBoxStyle.YesNo) = MsgBoxResult.No Then Exit Sub
+
+        TabControl1.TabPages.Clear()
+        TreeView1.Nodes.Clear()
+        If backupNode IsNot Nothing Then backupNode = Nothing
+
+        Dim files = GetFiles(SAVE_PATH)
+        Dim directories = GetDirectories(SAVE_PATH)
+        For Each f1 As String In files
+            FileIO.FileSystem.DeleteFile(f1)
+        Next
+        For Each f1 As String In directories
+            If Not f1.Substring(f1.LastIndexOf("\") + 1).ToUpper = "!!!BACKUPS" Then
+                FileIO.FileSystem.DeleteDirectory(f1, FileIO.DeleteDirectoryOption.DeleteAllContents)
+            End If
+        Next
+
+        For Each file In GetFiles(f(0))
+            Dim fileName = Path.GetFileName(file)
+            FileIO.FileSystem.CopyFile(file, SAVE_PATH + "\" + fileName, True)
+        Next
+        For Each d In GetDirectories(f(0))
+            FileIO.FileSystem.CopyDirectory(d, SAVE_PATH + "\" + d.Substring(d.LastIndexOf("\") + 1), True)
+        Next
+
+        load_recursively()
     End Sub
     'Menu Options/Backup/Delete
     Private Sub backup_delete(sender As Object, e As EventArgs)
         Dim o = DirectCast(sender, ToolStripMenuItem)
-        Dim folder = DateTime.Parse(o.OwnerItem.Text).ToString("yyyy-MM-dd HH.mm.ss.fff")
-        Dim f = GetDirectories(SAVE_PATH + "\!!!Backups", SearchOption.TopDirectoryOnly, {folder + "*"}).ToArray
+        Dim folder = DateTime.Parse(o.OwnerItem.Text).ToString("yyyy-MM-dd HH.mm.ss")
+        Dim f = GetDirectories(SAVE_PATH + "\!!!Backups", FileIO.SearchOption.SearchTopLevelOnly, {folder + ".*"}).ToArray
         If f.Count = 0 Then MsgBox("Directory not found. Was it deleted while zametker was running?") : Exit Sub
-        folder = f(0)
 
+        If MsgBox("Are you sure to delete " + f(0), MsgBoxStyle.YesNo) = MsgBoxResult.No Then Exit Sub
+
+        If backupNode IsNot Nothing Then
+            Dim node = backupNode.Nodes(f(0).Substring(f(0).LastIndexOf("\") + 1))
+            If node IsNot Nothing Then
+                backupNode.Nodes.Remove(node)
+            End If
+        End If
+        For i As Integer = ImageList1.Images.Keys.Count - 1 To 0 Step -1
+            If ImageList1.Images.Keys(i).ToUpper.StartsWith(f(0).ToUpper) Then
+                ImageList1.Images.RemoveAt(i)
+            End If
+        Next
+
+        Try
+            DeleteDirectory(f(0), FileIO.DeleteDirectoryOption.DeleteAllContents)
+        Catch ex As Exception
+            MsgBox(ex.Message)
+        End Try
+        o.OwnerItem.Owner.Items.Remove(o.OwnerItem)
     End Sub
 #End Region
 
@@ -2280,6 +2478,21 @@ Public Class Form1
         focusRtfNextTime = Nothing
         ini.IniWriteValue("Main", "Focus_RTF_on_tree_click", CheckBox9.Checked.ToString)
     End Sub
+    'Save tree state
+    Private Sub CheckBox11_CheckedChanged(sender As Object, e As EventArgs) Handles CheckBox11.CheckedChanged
+        If refr Or Not loaded Then Exit Sub
+        ini.IniWriteValue("Main", "Save_tree_state", CheckBox11.Checked.ToString)
+    End Sub
+    'Autostart
+    Private Sub CheckBox10_CheckedChanged(sender As Object, e As EventArgs) Handles CheckBox10.CheckedChanged
+        'If refr Or Not loaded Then Exit Sub
+        Dim rk = Microsoft.Win32.Registry.CurrentUser.OpenSubKey("SOFTWARE\Microsoft\Windows\CurrentVersion\Run", True)
+        If CheckBox10.Checked Then
+            rk.SetValue("ZametkeR", """" + Application.ExecutablePath + """")
+        Else
+            rk.DeleteValue("ZametkeR", False)
+        End If
+    End Sub
 #End Region
 
 #Region "Drag n drop"
@@ -2412,6 +2625,6 @@ Public Class Form1
             draggedNode = Nothing
         End If
     End Sub
-
 #End Region
+
 End Class

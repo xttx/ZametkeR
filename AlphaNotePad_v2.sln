@@ -20,10 +20,10 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(AutomaticVersions) = postSolution
-		UpdateAssemblyVersion.Release|Any CPU = True
-		UpdateAssemblyFileVersion.Release|Any CPU = True
-		UpdateAssemblyInfoVersion.Release|Any CPU = False
-		AssemblyVersionSettings.Release|Any CPU = None.None.Increment.None
-		AssemblyFileVersionSettings.Release|Any CPU = None.None.Increment.None
+		UpdateAssemblyVersion.Debug|Any CPU = True
+		UpdateAssemblyFileVersion.Debug|Any CPU = True
+		UpdateAssemblyInfoVersion.Debug|Any CPU = False
+		AssemblyVersionSettings.Debug|Any CPU = None.None.None.Increment
+		AssemblyFileVersionSettings.Debug|Any CPU = None.None.None.Increment
 	EndGlobalSection
 EndGlobal

@@ -1,9 +1,9 @@
-﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
+﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()>
 Partial Class Form1
     Inherits System.Windows.Forms.Form
 
     'Form overrides dispose to clean up the component list.
-    <System.Diagnostics.DebuggerNonUserCode()> _
+    <System.Diagnostics.DebuggerNonUserCode()>
     Protected Overrides Sub Dispose(ByVal disposing As Boolean)
         Try
             If disposing AndAlso components IsNot Nothing Then
@@ -20,12 +20,14 @@ Partial Class Form1
     'NOTE: The following procedure is required by the Windows Form Designer
     'It can be modified using the Windows Form Designer.  
     'Do not modify it using the code editor.
-    <System.Diagnostics.DebuggerStepThrough()> _
+    <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(Form1))
         Me.TabControl1 = New System.Windows.Forms.TabControl()
         Me.TabPageOptions = New System.Windows.Forms.TabPage()
+        Me.CheckBox11 = New System.Windows.Forms.CheckBox()
+        Me.CheckBox10 = New System.Windows.Forms.CheckBox()
         Me.Label7 = New System.Windows.Forms.Label()
         Me.CheckBox9 = New System.Windows.Forms.CheckBox()
         Me.CheckBox8 = New System.Windows.Forms.CheckBox()
@@ -124,6 +126,9 @@ Partial Class Form1
         Me.ToolStripButton29 = New System.Windows.Forms.ToolStripButton()
         Me.ToolStripButton30 = New System.Windows.Forms.ToolStripButton()
         Me.SplitContainer1 = New System.Windows.Forms.SplitContainer()
+        Me.Button2 = New System.Windows.Forms.Button()
+        Me.TrackBar1 = New System.Windows.Forms.TrackBar()
+        Me.Button1 = New System.Windows.Forms.Button()
         Me.Label6 = New System.Windows.Forms.Label()
         Me.Panel1 = New System.Windows.Forms.Panel()
         Me.Panel55 = New System.Windows.Forms.Panel()
@@ -165,6 +170,9 @@ Partial Class Form1
         Me.TreeView1 = New System.Windows.Forms.TreeView()
         Me.ImageList1 = New System.Windows.Forms.ImageList(Me.components)
         Me.ContextMenu_treeNode = New System.Windows.Forms.ContextMenuStrip(Me.components)
+        Me.RestoreFromBackupToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.CompareWithcurrentToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripSeparator10 = New System.Windows.Forms.ToolStripSeparator()
         Me.OpenInNewTabToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.OpenAllChildrenToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripMenuItem4 = New System.Windows.Forms.ToolStripSeparator()
@@ -189,9 +197,6 @@ Partial Class Form1
         Me.MenuItem_resetFont = New System.Windows.Forms.ToolStripMenuItem()
         Me.MenuItem_resetColors = New System.Windows.Forms.ToolStripMenuItem()
         Me.MenuItem_pass = New System.Windows.Forms.ToolStripMenuItem()
-        Me.RestoreFromBackupToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-        Me.CompareWithcurrentToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-        Me.ToolStripSeparator10 = New System.Windows.Forms.ToolStripSeparator()
         Me.TabControl1.SuspendLayout()
         Me.TabPageOptions.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
@@ -203,6 +208,7 @@ Partial Class Form1
         Me.SplitContainer1.Panel1.SuspendLayout()
         Me.SplitContainer1.Panel2.SuspendLayout()
         Me.SplitContainer1.SuspendLayout()
+        CType(Me.TrackBar1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.Panel1.SuspendLayout()
         Me.ToolStrip2.SuspendLayout()
         Me.ContextMenu_treeNode.SuspendLayout()
@@ -219,13 +225,15 @@ Partial Class Form1
         Me.TabControl1.Location = New System.Drawing.Point(0, 0)
         Me.TabControl1.Name = "TabControl1"
         Me.TabControl1.SelectedIndex = 0
-        Me.TabControl1.Size = New System.Drawing.Size(580, 353)
+        Me.TabControl1.Size = New System.Drawing.Size(583, 353)
         Me.TabControl1.SizeMode = System.Windows.Forms.TabSizeMode.Fixed
         Me.TabControl1.TabIndex = 0
         '
         'TabPageOptions
         '
         Me.TabPageOptions.BackColor = System.Drawing.Color.PaleGreen
+        Me.TabPageOptions.Controls.Add(Me.CheckBox11)
+        Me.TabPageOptions.Controls.Add(Me.CheckBox10)
         Me.TabPageOptions.Controls.Add(Me.Label7)
         Me.TabPageOptions.Controls.Add(Me.CheckBox9)
         Me.TabPageOptions.Controls.Add(Me.CheckBox8)
@@ -247,9 +255,31 @@ Partial Class Form1
         Me.TabPageOptions.Controls.Add(Me.Label1)
         Me.TabPageOptions.Location = New System.Drawing.Point(4, 22)
         Me.TabPageOptions.Name = "TabPageOptions"
-        Me.TabPageOptions.Size = New System.Drawing.Size(572, 327)
+        Me.TabPageOptions.Size = New System.Drawing.Size(575, 327)
         Me.TabPageOptions.TabIndex = 0
         Me.TabPageOptions.Text = "Options"
+        '
+        'CheckBox11
+        '
+        Me.CheckBox11.AutoSize = True
+        Me.CheckBox11.CheckAlign = System.Drawing.ContentAlignment.MiddleRight
+        Me.CheckBox11.Location = New System.Drawing.Point(440, 50)
+        Me.CheckBox11.Name = "CheckBox11"
+        Me.CheckBox11.Size = New System.Drawing.Size(101, 17)
+        Me.CheckBox11.TabIndex = 20
+        Me.CheckBox11.Text = "Save tree state:"
+        Me.CheckBox11.UseVisualStyleBackColor = True
+        '
+        'CheckBox10
+        '
+        Me.CheckBox10.AutoSize = True
+        Me.CheckBox10.CheckAlign = System.Drawing.ContentAlignment.MiddleRight
+        Me.CheckBox10.Location = New System.Drawing.Point(394, 25)
+        Me.CheckBox10.Name = "CheckBox10"
+        Me.CheckBox10.Size = New System.Drawing.Size(147, 17)
+        Me.CheckBox10.TabIndex = 19
+        Me.CheckBox10.Text = "Start when window starts:"
+        Me.CheckBox10.UseVisualStyleBackColor = True
         '
         'Label7
         '
@@ -1084,6 +1114,9 @@ Partial Class Form1
         '
         'SplitContainer1.Panel1
         '
+        Me.SplitContainer1.Panel1.Controls.Add(Me.Button2)
+        Me.SplitContainer1.Panel1.Controls.Add(Me.TrackBar1)
+        Me.SplitContainer1.Panel1.Controls.Add(Me.Button1)
         Me.SplitContainer1.Panel1.Controls.Add(Me.Label6)
         Me.SplitContainer1.Panel1.Controls.Add(Me.Panel1)
         Me.SplitContainer1.Panel1.Controls.Add(Me.ToolStrip2)
@@ -1093,13 +1126,44 @@ Partial Class Form1
         '
         Me.SplitContainer1.Panel2.Controls.Add(Me.TabControl1)
         Me.SplitContainer1.Size = New System.Drawing.Size(837, 353)
-        Me.SplitContainer1.SplitterDistance = 253
+        Me.SplitContainer1.SplitterDistance = 250
         Me.SplitContainer1.TabIndex = 3
+        '
+        'Button2
+        '
+        Me.Button2.Location = New System.Drawing.Point(16, 242)
+        Me.Button2.Name = "Button2"
+        Me.Button2.Size = New System.Drawing.Size(50, 20)
+        Me.Button2.TabIndex = 21
+        Me.Button2.Text = "100%"
+        Me.Button2.UseVisualStyleBackColor = True
+        '
+        'TrackBar1
+        '
+        Me.TrackBar1.LargeChange = 10
+        Me.TrackBar1.Location = New System.Drawing.Point(12, 219)
+        Me.TrackBar1.Maximum = 50
+        Me.TrackBar1.Minimum = 1
+        Me.TrackBar1.Name = "TrackBar1"
+        Me.TrackBar1.Size = New System.Drawing.Size(230, 45)
+        Me.TrackBar1.TabIndex = 21
+        Me.TrackBar1.Value = 10
+        Me.TrackBar1.Visible = False
+        '
+        'Button1
+        '
+        Me.Button1.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.Button1.Location = New System.Drawing.Point(220, 2)
+        Me.Button1.Name = "Button1"
+        Me.Button1.Size = New System.Drawing.Size(30, 25)
+        Me.Button1.TabIndex = 21
+        Me.Button1.Text = "<<"
+        Me.Button1.UseVisualStyleBackColor = True
         '
         'Label6
         '
         Me.Label6.AutoSize = True
-        Me.Label6.Location = New System.Drawing.Point(100, 240)
+        Me.Label6.Location = New System.Drawing.Point(27, 22)
         Me.Label6.Name = "Label6"
         Me.Label6.Size = New System.Drawing.Size(39, 13)
         Me.Label6.TabIndex = 13
@@ -1370,7 +1434,7 @@ Partial Class Form1
         Me.ToolStrip2.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripButton2, Me.ToolStripButton3, Me.ToolStripButton21, Me.ToolStripSeparator1, Me.ToolStripButton4, Me.ToolStripButton20, Me.ToolStripSeparator8, Me.ToolStripButton23, Me.ToolStripButton24, Me.ToolStripButton28})
         Me.ToolStrip2.Location = New System.Drawing.Point(0, 328)
         Me.ToolStrip2.Name = "ToolStrip2"
-        Me.ToolStrip2.Size = New System.Drawing.Size(253, 25)
+        Me.ToolStrip2.Size = New System.Drawing.Size(250, 25)
         Me.ToolStrip2.TabIndex = 1
         Me.ToolStrip2.Text = "ToolStrip2"
         '
@@ -1477,7 +1541,7 @@ Partial Class Form1
         Me.TreeView1.Location = New System.Drawing.Point(0, 0)
         Me.TreeView1.Name = "TreeView1"
         Me.TreeView1.SelectedImageIndex = 3
-        Me.TreeView1.Size = New System.Drawing.Size(253, 331)
+        Me.TreeView1.Size = New System.Drawing.Size(250, 331)
         Me.TreeView1.TabIndex = 0
         '
         'ImageList1
@@ -1495,102 +1559,122 @@ Partial Class Form1
         Me.ContextMenu_treeNode.Name = "ContextMenuStrip1"
         Me.ContextMenu_treeNode.Size = New System.Drawing.Size(191, 364)
         '
+        'RestoreFromBackupToolStripMenuItem
+        '
+        Me.RestoreFromBackupToolStripMenuItem.Name = "RestoreFromBackupToolStripMenuItem"
+        Me.RestoreFromBackupToolStripMenuItem.Size = New System.Drawing.Size(190, 22)
+        Me.RestoreFromBackupToolStripMenuItem.Text = "Restore from backup"
+        Me.RestoreFromBackupToolStripMenuItem.Visible = False
+        '
+        'CompareWithcurrentToolStripMenuItem
+        '
+        Me.CompareWithcurrentToolStripMenuItem.Name = "CompareWithcurrentToolStripMenuItem"
+        Me.CompareWithcurrentToolStripMenuItem.Size = New System.Drawing.Size(190, 22)
+        Me.CompareWithcurrentToolStripMenuItem.Text = "Compare with current"
+        Me.CompareWithcurrentToolStripMenuItem.Visible = False
+        '
+        'ToolStripSeparator10
+        '
+        Me.ToolStripSeparator10.Name = "ToolStripSeparator10"
+        Me.ToolStripSeparator10.Size = New System.Drawing.Size(187, 6)
+        Me.ToolStripSeparator10.Visible = False
+        '
         'OpenInNewTabToolStripMenuItem
         '
         Me.OpenInNewTabToolStripMenuItem.Name = "OpenInNewTabToolStripMenuItem"
-        Me.OpenInNewTabToolStripMenuItem.Size = New System.Drawing.Size(187, 22)
+        Me.OpenInNewTabToolStripMenuItem.Size = New System.Drawing.Size(190, 22)
         Me.OpenInNewTabToolStripMenuItem.Text = "Open in new tab"
         '
         'OpenAllChildrenToolStripMenuItem
         '
         Me.OpenAllChildrenToolStripMenuItem.Name = "OpenAllChildrenToolStripMenuItem"
-        Me.OpenAllChildrenToolStripMenuItem.Size = New System.Drawing.Size(187, 22)
+        Me.OpenAllChildrenToolStripMenuItem.Size = New System.Drawing.Size(190, 22)
         Me.OpenAllChildrenToolStripMenuItem.Text = "Open all children"
         '
         'ToolStripMenuItem4
         '
         Me.ToolStripMenuItem4.Name = "ToolStripMenuItem4"
-        Me.ToolStripMenuItem4.Size = New System.Drawing.Size(184, 6)
+        Me.ToolStripMenuItem4.Size = New System.Drawing.Size(187, 6)
         '
         'AddToolStripMenuItem
         '
         Me.AddToolStripMenuItem.Name = "AddToolStripMenuItem"
-        Me.AddToolStripMenuItem.Size = New System.Drawing.Size(187, 22)
+        Me.AddToolStripMenuItem.Size = New System.Drawing.Size(190, 22)
         Me.AddToolStripMenuItem.Text = "Add"
         '
         'AddChildToolStripMenuItem
         '
         Me.AddChildToolStripMenuItem.Name = "AddChildToolStripMenuItem"
-        Me.AddChildToolStripMenuItem.Size = New System.Drawing.Size(187, 22)
+        Me.AddChildToolStripMenuItem.Size = New System.Drawing.Size(190, 22)
         Me.AddChildToolStripMenuItem.Text = "Add Child"
         '
         'CloneToolStripMenuItem
         '
         Me.CloneToolStripMenuItem.Name = "CloneToolStripMenuItem"
-        Me.CloneToolStripMenuItem.Size = New System.Drawing.Size(187, 22)
+        Me.CloneToolStripMenuItem.Size = New System.Drawing.Size(190, 22)
         Me.CloneToolStripMenuItem.Text = "Clone"
         '
         'RenameToolStripMenuItem
         '
         Me.RenameToolStripMenuItem.Name = "RenameToolStripMenuItem"
-        Me.RenameToolStripMenuItem.Size = New System.Drawing.Size(187, 22)
+        Me.RenameToolStripMenuItem.Size = New System.Drawing.Size(190, 22)
         Me.RenameToolStripMenuItem.Text = "Rename"
         '
         'DeleteToolStripMenuItem
         '
         Me.DeleteToolStripMenuItem.Name = "DeleteToolStripMenuItem"
-        Me.DeleteToolStripMenuItem.Size = New System.Drawing.Size(187, 22)
+        Me.DeleteToolStripMenuItem.Size = New System.Drawing.Size(190, 22)
         Me.DeleteToolStripMenuItem.Text = "Delete"
         '
         'CopyAsFileToolStripMenuItem
         '
         Me.CopyAsFileToolStripMenuItem.Name = "CopyAsFileToolStripMenuItem"
-        Me.CopyAsFileToolStripMenuItem.Size = New System.Drawing.Size(187, 22)
+        Me.CopyAsFileToolStripMenuItem.Size = New System.Drawing.Size(190, 22)
         Me.CopyAsFileToolStripMenuItem.Text = "Copy as File"
         '
         'ToolStripMenuItem17
         '
         Me.ToolStripMenuItem17.Name = "ToolStripMenuItem17"
-        Me.ToolStripMenuItem17.Size = New System.Drawing.Size(184, 6)
+        Me.ToolStripMenuItem17.Size = New System.Drawing.Size(187, 6)
         '
         'SortChildrensToolStripMenuItem
         '
         Me.SortChildrensToolStripMenuItem.Name = "SortChildrensToolStripMenuItem"
-        Me.SortChildrensToolStripMenuItem.Size = New System.Drawing.Size(187, 22)
+        Me.SortChildrensToolStripMenuItem.Size = New System.Drawing.Size(190, 22)
         Me.SortChildrensToolStripMenuItem.Text = "Sort Childrens"
         '
         'ToolStripMenuItem2
         '
         Me.ToolStripMenuItem2.Name = "ToolStripMenuItem2"
-        Me.ToolStripMenuItem2.Size = New System.Drawing.Size(184, 6)
+        Me.ToolStripMenuItem2.Size = New System.Drawing.Size(187, 6)
         '
         'SetNoteForeColorToolStripMenuItem
         '
         Me.SetNoteForeColorToolStripMenuItem.Name = "SetNoteForeColorToolStripMenuItem"
-        Me.SetNoteForeColorToolStripMenuItem.Size = New System.Drawing.Size(187, 22)
+        Me.SetNoteForeColorToolStripMenuItem.Size = New System.Drawing.Size(190, 22)
         Me.SetNoteForeColorToolStripMenuItem.Text = "Set Note ForeColor"
         '
         'SetNoteBackColorToolStripMenuItem
         '
         Me.SetNoteBackColorToolStripMenuItem.Name = "SetNoteBackColorToolStripMenuItem"
-        Me.SetNoteBackColorToolStripMenuItem.Size = New System.Drawing.Size(187, 22)
+        Me.SetNoteBackColorToolStripMenuItem.Size = New System.Drawing.Size(190, 22)
         Me.SetNoteBackColorToolStripMenuItem.Text = "Set Note BackColor"
         '
         'SetCustomIconToolStripMenuItem
         '
         Me.SetCustomIconToolStripMenuItem.Name = "SetCustomIconToolStripMenuItem"
-        Me.SetCustomIconToolStripMenuItem.Size = New System.Drawing.Size(187, 22)
+        Me.SetCustomIconToolStripMenuItem.Size = New System.Drawing.Size(190, 22)
         Me.SetCustomIconToolStripMenuItem.Text = "Set Custom Icon ..."
         '
         'ToolStripMenuItem3
         '
         Me.ToolStripMenuItem3.Name = "ToolStripMenuItem3"
-        Me.ToolStripMenuItem3.Size = New System.Drawing.Size(184, 6)
+        Me.ToolStripMenuItem3.Size = New System.Drawing.Size(187, 6)
         '
         'PastAsNewNoteToolStripMenuItem
         '
         Me.PastAsNewNoteToolStripMenuItem.Name = "PastAsNewNoteToolStripMenuItem"
-        Me.PastAsNewNoteToolStripMenuItem.Size = New System.Drawing.Size(187, 22)
+        Me.PastAsNewNoteToolStripMenuItem.Size = New System.Drawing.Size(190, 22)
         Me.PastAsNewNoteToolStripMenuItem.Text = "Past as new note"
         '
         'ContextMenu_tree
@@ -1635,26 +1719,6 @@ Partial Class Form1
         Me.MenuItem_pass.Size = New System.Drawing.Size(157, 22)
         Me.MenuItem_pass.Text = "Set as password"
         '
-        'RestoreFromBackupToolStripMenuItem
-        '
-        Me.RestoreFromBackupToolStripMenuItem.Name = "RestoreFromBackupToolStripMenuItem"
-        Me.RestoreFromBackupToolStripMenuItem.Size = New System.Drawing.Size(190, 22)
-        Me.RestoreFromBackupToolStripMenuItem.Text = "Restore from backup"
-        Me.RestoreFromBackupToolStripMenuItem.Visible = False
-        '
-        'CompareWithcurrentToolStripMenuItem
-        '
-        Me.CompareWithcurrentToolStripMenuItem.Name = "CompareWithcurrentToolStripMenuItem"
-        Me.CompareWithcurrentToolStripMenuItem.Size = New System.Drawing.Size(190, 22)
-        Me.CompareWithcurrentToolStripMenuItem.Text = "Compare with current"
-        Me.CompareWithcurrentToolStripMenuItem.Visible = False
-        '
-        'ToolStripSeparator10
-        '
-        Me.ToolStripSeparator10.Name = "ToolStripSeparator10"
-        Me.ToolStripSeparator10.Size = New System.Drawing.Size(187, 6)
-        Me.ToolStripSeparator10.Visible = False
-        '
         'Form1
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -1686,6 +1750,7 @@ Partial Class Form1
         Me.SplitContainer1.Panel2.ResumeLayout(False)
         CType(Me.SplitContainer1, System.ComponentModel.ISupportInitialize).EndInit()
         Me.SplitContainer1.ResumeLayout(False)
+        CType(Me.TrackBar1, System.ComponentModel.ISupportInitialize).EndInit()
         Me.Panel1.ResumeLayout(False)
         Me.ToolStrip2.ResumeLayout(False)
         Me.ToolStrip2.PerformLayout()
@@ -1865,4 +1930,9 @@ Partial Class Form1
     Friend WithEvents RestoreFromBackupToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents CompareWithcurrentToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents ToolStripSeparator10 As ToolStripSeparator
+    Friend WithEvents CheckBox10 As CheckBox
+    Friend WithEvents CheckBox11 As CheckBox
+    Friend WithEvents Button1 As Button
+    Friend WithEvents TrackBar1 As TrackBar
+    Friend WithEvents Button2 As Button
 End Class
