@@ -144,6 +144,7 @@
     <ProjectReference Include="..\ClassLibrary1\diff.csproj">
       <Project>{14caa5c6-ab7a-4136-b9ba-932ae546cc98}</Project>
       <Name>diff</Name>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
