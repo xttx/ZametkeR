@@ -567,7 +567,7 @@ Public Class Form1
         'set first and last noService tabs and Check if this note already opened
         For Each tabpage In TabControl1.TabPages
             'If tabpage.Text = node.Text Then TabControl1.SelectedTab = tabpage : refr = False : Exit Sub
-            If tabpage IsNot optionsTabPage And tabpage.Text.ToUpper <> "SEARCH" Then
+            If tabpage IsNot optionsTabPage And tabpage.Text.ToUpper <> "SEARCH" And tabpage.Text.ToUpper <> "COMPARE" Then
                 'Check if this note already opened
                 rtf = tabpage.Controls.OfType(Of RichTextBox).First
                 If content_associatedNodes.ContainsKey(rtf) AndAlso content_associatedNodes(rtf) Is node Then
@@ -613,7 +613,7 @@ Public Class Form1
                     TabControl1.SelectedTab = tabpage
                 End If
             End If
-            If tabpage.Text.ToUpper = "SEARCH" Then
+            If tabpage.Text.ToUpper = "SEARCH" Or tabpage.Text.ToUpper = "COMPARE" Then
                 If (RadioButton9.Checked Or RadioButton10.Checked) And CheckBox6.Checked Then TabControl1.TabPages.Remove(tabpage)
                 If RadioButton9.Checked Then tabpage = TabControl1.TabPages(firstNoServiceTab)
                 If RadioButton10.Checked Then tabpage = TabControl1.TabPages(lastNoServiceTab)
@@ -874,7 +874,7 @@ Public Class Form1
             If TabControl1.SelectedIndex <> i Then closeButton.X = closeButton.X - 2 : closeButton.Y = closeButton.Y + 2
 
             If closeButton.Contains(e.Location) Then
-                If Not TabControl1.TabPages(i).Text = "Options" Then
+                If Not TabControl1.TabPages(i).Text = "Options" And Not TabControl1.TabPages(i).Text = "Compare" Then
                     Dim rtf = TabControl1.TabPages(i).Controls.OfType(Of RichTextBox).First
                     content_associatedNodes.Remove(rtf)
                 End If
@@ -908,7 +908,7 @@ Public Class Form1
             ToolStripButton25.Enabled = False
             ToolStripButton25.Image = ImageList1.Images(0)
         Else
-            If TabControl1.TabPages(ind).Text = "Search" Then
+            If TabControl1.TabPages(ind).Text = "Search" Or TabControl1.TabPages(ind).Text = "Compare" Then
                 ToolStripButton25.Checked = False
                 ToolStripButton25.Enabled = False
                 ToolStripButton25.Image = ImageList1.Images(0)
@@ -1083,7 +1083,7 @@ Public Class Form1
         End If
 
         For Each tabPage As TabPage In TabControl1.TabPages
-            If tabPage.Text = "Options" Then Continue For
+            If tabPage.Text = "Options" Or tabPage.Text = "Compare" Then Continue For
             Dim rtf = tabPage.Controls.OfType(Of RichTextBox).First
             If content_associatedNodes(rtf) Is node Then
                 tabPage.Text = newname
@@ -1096,7 +1096,7 @@ Public Class Form1
         'set focus
         If nameIsEntered Then
             If TabControl1.SelectedTab IsNot Nothing Then
-                If TabControl1.SelectedTab.Text <> "Options" Then
+                If TabControl1.SelectedTab.Text <> "Options" And TabControl1.SelectedTab.Text <> "Compare" Then
                     Dim rtf = TabControl1.SelectedTab.Controls.OfType(Of RichTextBox).First
                     rtf.Select()
                 End If
@@ -2123,6 +2123,55 @@ Public Class Form1
                 nodeForContextMenu.Nodes.Add(t)
             Next
         End If
+    End Sub
+    'Compare with selected
+    Private Sub ToolStripMenuItem21_Click(sender As Object, e As EventArgs) Handles ToolStripMenuItem21.Click
+        If nodeForContextMenu Is Nothing Then Exit Sub
+        If TreeView1.SelectedNode Is Nothing Then Exit Sub
+        If nodeForContextMenu Is TreeView1.SelectedNode Then MsgBox("Cant compare '" + nodeForContextMenu.Text + "' with itself. You must select a node, then right click on another node to compare them.") : Exit Sub
+
+        Dim rtf1 = New RichTextBox
+        Dim rtf2 = New RichTextBox
+
+        If content(TreeView1.SelectedNode).Contains("{%%%UNLOADED%%%") Then
+            Dim f = SAVE_PATH + "\" + TreeView1.SelectedNode.FullPath + ".zam"
+            If FileExists(f) Then content(TreeView1.SelectedNode) = load_content(f, TreeView1.SelectedNode)
+        End If
+        If content(nodeForContextMenu).Contains("{%%%UNLOADED%%%") Then
+            Dim f = SAVE_PATH + "\" + nodeForContextMenu.FullPath + ".zam"
+            If FileExists(f) Then content(nodeForContextMenu) = load_content(f, nodeForContextMenu)
+        End If
+        rtf1.Rtf = content(TreeView1.SelectedNode)
+        rtf2.Rtf = content(nodeForContextMenu)
+
+        Dim diff = New DiffMatchPatch.diff_match_patch
+        Dim diffs = diff.diff_main(rtf1.Text, rtf2.Text)
+        Dim pos1 As Integer = 0, pos2 As Integer = 0
+        For Each d In diffs
+            If d.operation = DiffMatchPatch.Operation.DELETE Then
+                rtf1.SelectionStart = pos1
+                rtf1.SelectionLength = d.text.Length
+                rtf1.SelectionBackColor = Color.Red
+                If d.text.Contains(vbLf) Then rtf2.Select(pos2, 0) : rtf2.SelectedText = New String(vbCrLf, d.text.Count(Function(c As Char) c = vbLf))
+                pos1 = pos1 + d.text.Length
+            End If
+            If d.operation = DiffMatchPatch.Operation.INSERT Then
+                rtf2.SelectionStart = pos2
+                rtf2.SelectionLength = d.text.Length
+                rtf2.SelectionBackColor = Color.LightGreen
+                If d.text.Contains(vbLf) Then rtf1.Select(pos1, 0) : rtf1.SelectedText = New String(vbCrLf, d.text.Count(Function(c As Char) c = vbLf))
+                pos2 = pos2 + d.text.Length
+            End If
+            If d.operation = DiffMatchPatch.Operation.EQUAL Then pos1 += d.text.Length : pos2 += d.text.Length
+        Next
+
+        TabControl1.TabPages.Add("Compare")
+        Dim tab = TabControl1.TabPages(TabControl1.TabPages.Count - 1)
+        Dim splt As New SplitContainer : tab.Controls.Add(splt)
+        splt.Dock = DockStyle.Fill : splt.SplitterDistance = Math.Round(splt.Width / 2)
+        splt.Panel1.Controls.Add(rtf1) : splt.Panel2.Controls.Add(rtf2)
+        rtf1.Dock = DockStyle.Fill : rtf2.Dock = DockStyle.Fill
+        TabControl1.SelectedTab = tab
     End Sub
     'Set fore color
     Private Sub setForeColor(sender As Object, e As EventArgs)
