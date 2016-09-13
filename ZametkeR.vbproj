@@ -146,6 +146,10 @@
       <Name>diff</Name>
       <EmbedInteropTypes>False</EmbedInteropTypes>
     </ProjectReference>
+    <ProjectReference Include="..\Zprint\Zprint.csproj">
+      <Project>{4912785c-c477-45f6-891f-f22650a70daa}</Project>
+      <Name>Zprint</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

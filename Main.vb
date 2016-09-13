@@ -10,6 +10,7 @@
 
     Public Sub New()
         loading_start = Date.Now
+        System.IO.Directory.SetCurrentDirectory(Application.StartupPath)
         ini.path = (".\ZametkeR.ini")
 
         'Initialize the menus

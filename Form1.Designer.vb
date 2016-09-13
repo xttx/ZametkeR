@@ -184,6 +184,7 @@ Partial Class Form1
         Me.CopyAsFileToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripMenuItem17 = New System.Windows.Forms.ToolStripSeparator()
         Me.SortChildrensToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripMenuItem21 = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripMenuItem2 = New System.Windows.Forms.ToolStripSeparator()
         Me.SetNoteForeColorToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.SetNoteBackColorToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
@@ -197,7 +198,7 @@ Partial Class Form1
         Me.MenuItem_resetFont = New System.Windows.Forms.ToolStripMenuItem()
         Me.MenuItem_resetColors = New System.Windows.Forms.ToolStripMenuItem()
         Me.MenuItem_pass = New System.Windows.Forms.ToolStripMenuItem()
-        Me.ToolStripMenuItem21 = New System.Windows.Forms.ToolStripMenuItem()
+        Me.PreviewPrintToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.TabControl1.SuspendLayout()
         Me.TabPageOptions.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
@@ -623,7 +624,7 @@ Partial Class Form1
         '
         'FileToolStripMenuItem
         '
-        Me.FileToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.TxtExpottToolStripMenuItem, Me.ToolStripMenuItem1, Me.ExitToolStripMenuItem})
+        Me.FileToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.TxtExpottToolStripMenuItem, Me.PreviewPrintToolStripMenuItem, Me.ToolStripMenuItem1, Me.ExitToolStripMenuItem})
         Me.FileToolStripMenuItem.Name = "FileToolStripMenuItem"
         Me.FileToolStripMenuItem.Size = New System.Drawing.Size(37, 20)
         Me.FileToolStripMenuItem.Text = "File"
@@ -632,7 +633,7 @@ Partial Class Form1
         '
         Me.TxtExpottToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.CurrentToolStripMenuItem, Me.AllToolStripMenuItem})
         Me.TxtExpottToolStripMenuItem.Name = "TxtExpottToolStripMenuItem"
-        Me.TxtExpottToolStripMenuItem.Size = New System.Drawing.Size(126, 22)
+        Me.TxtExpottToolStripMenuItem.Size = New System.Drawing.Size(158, 22)
         Me.TxtExpottToolStripMenuItem.Text = "Txt Export"
         '
         'CurrentToolStripMenuItem
@@ -650,12 +651,12 @@ Partial Class Form1
         'ToolStripMenuItem1
         '
         Me.ToolStripMenuItem1.Name = "ToolStripMenuItem1"
-        Me.ToolStripMenuItem1.Size = New System.Drawing.Size(123, 6)
+        Me.ToolStripMenuItem1.Size = New System.Drawing.Size(155, 6)
         '
         'ExitToolStripMenuItem
         '
         Me.ExitToolStripMenuItem.Name = "ExitToolStripMenuItem"
-        Me.ExitToolStripMenuItem.Size = New System.Drawing.Size(126, 22)
+        Me.ExitToolStripMenuItem.Size = New System.Drawing.Size(158, 22)
         Me.ExitToolStripMenuItem.Text = "Exit"
         '
         'EditToolStripMenuItem
@@ -1558,7 +1559,7 @@ Partial Class Form1
         '
         Me.ContextMenu_treeNode.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.RestoreFromBackupToolStripMenuItem, Me.CompareWithcurrentToolStripMenuItem, Me.ToolStripSeparator10, Me.OpenInNewTabToolStripMenuItem, Me.OpenAllChildrenToolStripMenuItem, Me.ToolStripMenuItem4, Me.AddToolStripMenuItem, Me.AddChildToolStripMenuItem, Me.CloneToolStripMenuItem, Me.RenameToolStripMenuItem, Me.DeleteToolStripMenuItem, Me.CopyAsFileToolStripMenuItem, Me.ToolStripMenuItem17, Me.SortChildrensToolStripMenuItem, Me.ToolStripMenuItem21, Me.ToolStripMenuItem2, Me.SetNoteForeColorToolStripMenuItem, Me.SetNoteBackColorToolStripMenuItem, Me.SetCustomIconToolStripMenuItem, Me.ToolStripMenuItem3, Me.PastAsNewNoteToolStripMenuItem})
         Me.ContextMenu_treeNode.Name = "ContextMenuStrip1"
-        Me.ContextMenu_treeNode.Size = New System.Drawing.Size(196, 408)
+        Me.ContextMenu_treeNode.Size = New System.Drawing.Size(196, 386)
         '
         'RestoreFromBackupToolStripMenuItem
         '
@@ -1644,6 +1645,12 @@ Partial Class Form1
         Me.SortChildrensToolStripMenuItem.Size = New System.Drawing.Size(195, 22)
         Me.SortChildrensToolStripMenuItem.Text = "Sort Childrens"
         '
+        'ToolStripMenuItem21
+        '
+        Me.ToolStripMenuItem21.Name = "ToolStripMenuItem21"
+        Me.ToolStripMenuItem21.Size = New System.Drawing.Size(195, 22)
+        Me.ToolStripMenuItem21.Text = "Compare with selected"
+        '
         'ToolStripMenuItem2
         '
         Me.ToolStripMenuItem2.Name = "ToolStripMenuItem2"
@@ -1720,11 +1727,11 @@ Partial Class Form1
         Me.MenuItem_pass.Size = New System.Drawing.Size(157, 22)
         Me.MenuItem_pass.Text = "Set as password"
         '
-        'ToolStripMenuItem21
+        'PreviewPrintToolStripMenuItem
         '
-        Me.ToolStripMenuItem21.Name = "ToolStripMenuItem21"
-        Me.ToolStripMenuItem21.Size = New System.Drawing.Size(195, 22)
-        Me.ToolStripMenuItem21.Text = "Compare with selected"
+        Me.PreviewPrintToolStripMenuItem.Name = "PreviewPrintToolStripMenuItem"
+        Me.PreviewPrintToolStripMenuItem.Size = New System.Drawing.Size(168, 22)
+        Me.PreviewPrintToolStripMenuItem.Text = "Preview && Print ..."
         '
         'Form1
         '
@@ -1943,4 +1950,5 @@ Partial Class Form1
     Friend WithEvents TrackBar1 As TrackBar
     Friend WithEvents Button2 As Button
     Friend WithEvents ToolStripMenuItem21 As ToolStripMenuItem
+    Friend WithEvents PreviewPrintToolStripMenuItem As ToolStripMenuItem
 End Class

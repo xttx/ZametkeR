@@ -8,6 +8,8 @@ Public Class Form1
     Private Shared Function SendMessage(ByVal hWnd As IntPtr, ByVal Msg As UInteger, ByVal wParam As IntPtr, ByVal lParam As IntPtr) As IntPtr
     End Function
 
+    Const MIN_PAGE_WIDTH As Integer = 400
+
     Dim refr As Boolean = False
     Dim loaded As Boolean = False
     Dim order As New List(Of String)
@@ -34,7 +36,6 @@ Public Class Form1
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         refr = True
         loaded = True
-
         Button2.Parent = TrackBar1 : Button2.Left = 5 : Button2.Top = 25
 
         optionsTabPage = TabControl1.TabPages(0)
@@ -184,6 +185,16 @@ Public Class Form1
                 Me.Close()
             End If
         End If
+
+        If Not loaded Then Exit Sub
+
+        'be sure that all rtf have minimum width
+        For Each t As TabPage In TabControl1.TabPages
+            If t Is optionsTabPage Or t.Text.ToUpper = "SEARCH" Or t.Text.ToUpper = "COMPARE" Then Continue For
+            Dim rtf = t.Controls.OfType(Of RichTextBox).First
+            Dim p As Integer = Math.Round((rtf.Parent.Width - MIN_PAGE_WIDTH) / 2)
+            If t.Padding.Left > p Then t.Padding = New Padding(p, 0, p, 0)
+        Next
     End Sub
 
     'Load notes
@@ -691,18 +702,6 @@ Public Class Form1
         Return rtf
     End Function
 
-    'Past as new
-    Private Sub pastAsNewNote()
-        Dim str = Clipboard.GetText.Trim
-        Dim words = str.Split({" "c}, StringSplitOptions.RemoveEmptyEntries)
-        Dim newname As String = "New Page"
-        If words.Count > 0 Then newname = words(0)
-        If words.Count > 1 Then newname = words(0) + " " + words(1)
-
-        'add page
-        ToolStripButton2_Click(ToolStripButton2, New EventArgs, newname, Clipboard.GetText.Trim)
-    End Sub
-
     'Change rtf text
     Private Sub rtf_TextChanged(sender As Object, e As EventArgs)
         If refr Then Exit Sub
@@ -819,9 +818,10 @@ Public Class Form1
             d = -d
             Dim rtf = DirectCast(sender, RichTextBox)
             Dim p = rtf.Parent.Padding.Left
-            p = (p + d / 4)
+            p = p + (d / 4)
             If p < 0 Then p = 0
-            If p > 270 Then p = 270
+            'If p > 270 Then p = 270
+            If p > Math.Round((rtf.Parent.Width - MIN_PAGE_WIDTH) / 2) Then p = Math.Round((rtf.Parent.Width - MIN_PAGE_WIDTH) / 2)
             rtf.Parent.Padding = New Padding(p, 0, p, 0)
         End If
         If ctrl Then
@@ -855,10 +855,11 @@ Public Class Form1
         If e.Index > TabControl1.TabCount - 1 Then Exit Sub
         Dim text = TabControl1.TabPages(e.Index).Text
         If e.Graphics.MeasureString(text, e.Font).Width > 100 Then
+            Dim asterix As String = IIf(text.EndsWith("*"), "*", "")
             Do While e.Graphics.MeasureString(text, e.Font).Width > 90
                 text = text.Substring(0, text.Length - 1)
             Loop
-            text = text + "..."
+            text = text + asterix + "..."
         End If
         e.Graphics.FillRectangle(New SolidBrush(SystemColors.Control), e.Bounds)
         e.Graphics.DrawString("x", e.Font, Brushes.Black, e.Bounds.Right - 15, e.Bounds.Top + 4)
@@ -901,6 +902,7 @@ Public Class Form1
     End Sub
     'Handle encrypt button
     Private Sub TabControl1_SelectedIndexChanged(sender As Object, e As EventArgs) Handles TabControl1.SelectedIndexChanged
+        Dim refr_was_true As Boolean = refr
         refr = True
         Dim ind = TabControl1.SelectedIndex
         If ind < 0 Then
@@ -908,11 +910,12 @@ Public Class Form1
             ToolStripButton25.Enabled = False
             ToolStripButton25.Image = ImageList1.Images(0)
         Else
-            If TabControl1.TabPages(ind).Text = "Search" Or TabControl1.TabPages(ind).Text = "Compare" Then
+            If TabControl1.TabPages(ind) Is optionsTabPage Or TabControl1.TabPages(ind).Text = "Search" Or TabControl1.TabPages(ind).Text = "Compare" Then
                 ToolStripButton25.Checked = False
                 ToolStripButton25.Enabled = False
                 ToolStripButton25.Image = ImageList1.Images(0)
-            ElseIf TabControl1.TabPages(ind).Controls.Count = 1 Then
+                'ElseIf TabControl1.TabPages(ind).Controls.Count = 1 Then
+            ElseIf TabControl1.TabPages(ind).Controls.Count > 0 Then
                 ToolStripButton25.Enabled = True
                 Dim rtf = TabControl1.TabPages(ind).Controls.OfType(Of RichTextBox).First
                 Dim node = content_associatedNodes(rtf)
@@ -925,7 +928,7 @@ Public Class Form1
                 End If
             End If
         End If
-        refr = False
+        If Not refr_was_true Then refr = False
     End Sub
 
     'Add page
@@ -1831,6 +1834,22 @@ Public Class Form1
             exportRecur(node_sub, rootPath)
         Next
     End Sub
+    'Menu File/Preview & print
+    Private Sub PreviewPrintToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles PreviewPrintToolStripMenuItem.Click
+        Dim t As TabPage = TabControl1.SelectedTab
+        If t IsNot Nothing Then
+            If t IsNot optionsTabPage And t.Text.ToUpper <> "SEARCH" And t.Text.ToUpper <> "COMPARE" Then
+                Dim rtf = t.Controls.OfType(Of RichTextBox).First
+                Dim doc As New PrintPreviewRichTextBox.RichTextBoxDocument(rtf)
+                doc.Header = String.Format(vbTab + "{0}", t.Text)
+                doc.Footer = String.Format("{0}" + vbTab + "{1}" + vbTab + "Page [page] of [pages]", DateTime.Today.ToShortDateString(), DateTime.Now.ToShortTimeString())
+
+                Dim dlg = New PrintPreviewDialog()
+                dlg.Document = doc
+                dlg.ShowDialog(Me)
+            End If
+        End If
+    End Sub
 
     'Edit/Set font size for opened pages
     Private Sub ToolStripMenuItem5_Click(sender As Object, e As EventArgs) Handles ToolStripMenuItem5.Click,
@@ -2220,7 +2239,17 @@ Public Class Form1
         pastAsNewNote()
         nodeForContextMenu = Nothing
     End Sub
+    'Past as new node sub
+    Private Sub pastAsNewNote()
+        Dim str = Clipboard.GetText.Trim
+        Dim words = str.Split({" "c}, StringSplitOptions.RemoveEmptyEntries)
+        Dim newname As String = "New Page"
+        If words.Count > 0 Then newname = words(0)
+        If words.Count > 1 Then newname = words(0) + " " + words(1)
 
+        'add page
+        ToolStripButton2_Click(ToolStripButton2, New EventArgs, newname, Clipboard.GetText.Trim)
+    End Sub
     'Context Menu Hide
     Private Sub ContextMenuStrip1_Closing(sender As Object, e As ToolStripDropDownClosingEventArgs) Handles ContextMenu_treeNode.Closing
         nodeForContextMenu.BackColor = colorForContextMenu
