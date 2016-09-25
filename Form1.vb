@@ -218,9 +218,6 @@ Public Class Form1
         If Not dir_root.EndsWith("\") Then dir_root = dir_root + "\"
 
         Dim files = GetFiles(SAVE_PATH, FileIO.SearchOption.SearchAllSubDirectories, {"*.zam"}).ToList
-        'For i As Integer = files.Count - 1 To 0 Step -1
-        '    'If files(i).ToUpper.Contains("!!!BACKUPS") Then files.RemoveAt(i)
-        'Next
         If RadioButton3.Checked Or RadioButton4.Checked Then files.Sort()
 
         'ORDER
@@ -255,80 +252,81 @@ Public Class Form1
         'ORDER END
 
         For Each f In files
-            Dim node As TreeNode = Nothing
-            Dim fname = f.Substring(f.LastIndexOf("\") + 1)
-            Dim fnameNoExt = fname.Substring(0, fname.LastIndexOf("."))
-            Dim dir = f.Substring(0, f.LastIndexOf("\"))
-            dir = GetDirectoryInfo(dir).FullName
-            If Not dir.EndsWith("\") Then dir = dir + "\"
-            Dim dir_rel = dir.Substring(dir_root.Length).Trim
-            If Not dir_rel.EndsWith("\") Then dir_rel = dir_rel + "\"
+            load_node(f)
+            'Dim node As TreeNode = Nothing
+            'Dim fname = f.Substring(f.LastIndexOf("\") + 1)
+            'Dim fnameNoExt = fname.Substring(0, fname.LastIndexOf("."))
+            'Dim dir = f.Substring(0, f.LastIndexOf("\"))
+            'dir = GetDirectoryInfo(dir).FullName
+            'If Not dir.EndsWith("\") Then dir = dir + "\"
+            'Dim dir_rel = dir.Substring(dir_root.Length).Trim
+            'If Not dir_rel.EndsWith("\") Then dir_rel = dir_rel + "\"
 
-            If dir_rel = "\" Then
-                node = TreeView1.Nodes.Add(fnameNoExt, fnameNoExt) : content.Add(node, "") : node.ImageIndex = 3 : node.SelectedImageIndex = 3
-            Else
-                dir_rel += fnameNoExt
-                For Each path As String In dir_rel.Split("\"c)
-                    If node Is Nothing Then
-                        node = TreeView1.Nodes(path)
-                        If node Is Nothing Then node = TreeView1.Nodes.Add(path, path) : content.Add(node, "") : node.ImageIndex = 3 : node.SelectedImageIndex = 3
-                    Else
-                        If node.Nodes(path) Is Nothing Then
-                            If node.ImageKey = "" Then node.ImageIndex = 2 : node.SelectedImageIndex = 2
-                            node = node.Nodes.Add(path, path) : content.Add(node, "") : node.ImageIndex = 3 : node.SelectedImageIndex = 3
-                        Else
-                            node = node.Nodes(path)
-                        End If
-                    End If
-                Next
-            End If
+            'If dir_rel = "\" Then
+            '    node = TreeView1.Nodes.Add(fnameNoExt, fnameNoExt) : content.Add(node, "") : node.ImageIndex = 3 : node.SelectedImageIndex = 3
+            'Else
+            '    dir_rel += fnameNoExt
+            '    For Each path As String In dir_rel.Split("\"c)
+            '        If node Is Nothing Then
+            '            node = TreeView1.Nodes(path)
+            '            If node Is Nothing Then node = TreeView1.Nodes.Add(path, path) : content.Add(node, "") : node.ImageIndex = 3 : node.SelectedImageIndex = 3
+            '        Else
+            '            If node.Nodes(path) Is Nothing Then
+            '                If node.ImageKey = "" Then node.ImageIndex = 2 : node.SelectedImageIndex = 2
+            '                node = node.Nodes.Add(path, path) : content.Add(node, "") : node.ImageIndex = 3 : node.SelectedImageIndex = 3
+            '            Else
+            '                node = node.Nodes(path)
+            '            End If
+            '        End If
+            '    Next
+            'End If
 
-            Dim isReminder As Boolean = node.Text.ToUpper = "REMINDERS"
-            isReminder = isReminder Or (node.Parent IsNot Nothing AndAlso node.Parent.Text.ToUpper = "REMINDERS")
-            isReminder = isReminder And Not node.FullPath.ToUpper.StartsWith("!!!BACKUPS")
-            If CheckBox3.Checked And Not isReminder Then
-                content(node) = "{%%%UNLOADED%%%}"
-            Else
-                Dim tmp = load_content(f, node)
-                content(node) = tmp
+            'Dim isReminder As Boolean = node.Text.ToUpper = "REMINDERS"
+            'isReminder = isReminder Or (node.Parent IsNot Nothing AndAlso node.Parent.Text.ToUpper = "REMINDERS")
+            'isReminder = isReminder And Not node.FullPath.ToUpper.StartsWith("!!!BACKUPS")
+            'If CheckBox3.Checked And Not isReminder Then
+            '    content(node) = "{%%%UNLOADED%%%}"
+            'Else
+            '    Dim tmp = load_content(f, node)
+            '    content(node) = tmp
 
-                'reminder check
-                If node.Text.ToUpper = "REMINDERS" Then
-                    node.BackColor = Color.LightBlue
-                    Dim tmprtf As New RichTextBox
-                    If tmp.ToUpper.StartsWith("{\RTF") Then
-                        tmprtf.Rtf = tmp
-                    Else
-                        tmprtf.Text = tmp
-                    End If
-                    checkReminders(tmprtf)
-                End If
+            '    'reminder check
+            '    If node.Text.ToUpper = "REMINDERS" Then
+            '        node.BackColor = Color.LightBlue
+            '        Dim tmprtf As New RichTextBox
+            '        If tmp.ToUpper.StartsWith("{\RTF") Then
+            '            tmprtf.Rtf = tmp
+            '        Else
+            '            tmprtf.Text = tmp
+            '        End If
+            '        checkReminders(tmprtf)
+            '    End If
 
-                If node.Parent IsNot Nothing AndAlso node.Parent.Text.ToUpper = "REMINDERS" Then
-                    node.ForeColor = Color.Aqua
-                    Dim tmprtf As New RichTextBox
-                    If tmp.ToUpper.StartsWith("{\RTF") Then
-                        tmprtf.Rtf = tmp
-                    Else
-                        tmprtf.Text = tmp
-                    End If
-                    checkRemindersAstralis(tmprtf, node)
-                End If
-                'END reminder check
-            End If
+            '    If node.Parent IsNot Nothing AndAlso node.Parent.Text.ToUpper = "REMINDERS" Then
+            '        node.ForeColor = Color.Aqua
+            '        Dim tmprtf As New RichTextBox
+            '        If tmp.ToUpper.StartsWith("{\RTF") Then
+            '            tmprtf.Rtf = tmp
+            '        Else
+            '            tmprtf.Text = tmp
+            '        End If
+            '        checkRemindersAstralis(tmprtf, node)
+            '    End If
+            '    'END reminder check
+            'End If
 
-            'Need to be loaded unconditionally, because it show node colors
-            load_bcg(f, node)
+            ''Need to be loaded unconditionally, because it show node colors
+            'load_bcg(f, node)
 
-            'custom icon
-            If FileExists(dir + fnameNoExt + ".png") Then
-                Dim img = Image.FromFile(dir + fnameNoExt + ".png")
-                ImageList1.Images.Add(dir + fnameNoExt + ".png", img)
-                img.Dispose()
+            ''custom icon
+            'If FileExists(dir + fnameNoExt + ".png") Then
+            '    Dim img = Image.FromFile(dir + fnameNoExt + ".png")
+            '    ImageList1.Images.Add(dir + fnameNoExt + ".png", img)
+            '    img.Dispose()
 
-                node.ImageKey = dir + fnameNoExt + ".png"
-                node.SelectedImageKey = dir + fnameNoExt + ".png"
-            End If
+            '    node.ImageKey = dir + fnameNoExt + ".png"
+            '    node.SelectedImageKey = dir + fnameNoExt + ".png"
+            'End If
         Next
 
         'expand nodes
@@ -343,6 +341,85 @@ Public Class Form1
         If backupNode IsNot Nothing Then backupNode.Remove()
 
         If TreeView1.Nodes.Count > 0 AndAlso TreeView1.SelectedNode Is Nothing Then TreeView1.SelectedNode = TreeView1.Nodes(0)
+    End Sub
+    Private Sub load_node(f As String)
+        Dim dir_root = GetDirectoryInfo(SAVE_PATH).FullName
+        If Not dir_root.EndsWith("\") Then dir_root = dir_root + "\"
+
+        Dim node As TreeNode = Nothing
+        Dim fname = f.Substring(f.LastIndexOf("\") + 1)
+        Dim fnameNoExt = fname.Substring(0, fname.LastIndexOf("."))
+        Dim dir = f.Substring(0, f.LastIndexOf("\"))
+        dir = GetDirectoryInfo(dir).FullName
+        If Not dir.EndsWith("\") Then dir = dir + "\"
+        Dim dir_rel = dir.Substring(dir_root.Length).Trim
+        If Not dir_rel.EndsWith("\") Then dir_rel = dir_rel + "\"
+
+        If dir_rel = "\" Then
+            node = TreeView1.Nodes.Add(fnameNoExt, fnameNoExt) : content.Add(node, "") : node.ImageIndex = 3 : node.SelectedImageIndex = 3
+        Else
+            dir_rel += fnameNoExt
+            For Each path As String In dir_rel.Split("\"c)
+                If node Is Nothing Then
+                    node = TreeView1.Nodes(path)
+                    If node Is Nothing Then node = TreeView1.Nodes.Add(path, path) : content.Add(node, "") : node.ImageIndex = 3 : node.SelectedImageIndex = 3
+                Else
+                    If node.Nodes(path) Is Nothing Then
+                        If node.ImageKey = "" Then node.ImageIndex = 2 : node.SelectedImageIndex = 2
+                        node = node.Nodes.Add(path, path) : content.Add(node, "") : node.ImageIndex = 3 : node.SelectedImageIndex = 3
+                    Else
+                        node = node.Nodes(path)
+                    End If
+                End If
+            Next
+        End If
+
+        Dim isReminder As Boolean = node.Text.ToUpper = "REMINDERS"
+        isReminder = isReminder Or (node.Parent IsNot Nothing AndAlso node.Parent.Text.ToUpper = "REMINDERS")
+        isReminder = isReminder And Not node.FullPath.ToUpper.StartsWith("!!!BACKUPS")
+        If CheckBox3.Checked And Not isReminder Then
+            content(node) = "{%%%UNLOADED%%%}"
+        Else
+            Dim tmp = load_content(f, node)
+            content(node) = tmp
+
+            'reminder check
+            If node.Text.ToUpper = "REMINDERS" Then
+                node.BackColor = Color.LightBlue
+                Dim tmprtf As New RichTextBox
+                If tmp.ToUpper.StartsWith("{\RTF") Then
+                    tmprtf.Rtf = tmp
+                Else
+                    tmprtf.Text = tmp
+                End If
+                checkReminders(tmprtf)
+            End If
+
+            If node.Parent IsNot Nothing AndAlso node.Parent.Text.ToUpper = "REMINDERS" Then
+                node.ForeColor = Color.Aqua
+                Dim tmprtf As New RichTextBox
+                If tmp.ToUpper.StartsWith("{\RTF") Then
+                    tmprtf.Rtf = tmp
+                Else
+                    tmprtf.Text = tmp
+                End If
+                checkRemindersAstralis(tmprtf, node)
+            End If
+            'END reminder check
+        End If
+
+        'Need to be loaded unconditionally, because it show node colors
+        load_bcg(f, node)
+
+        'custom icon
+        If FileExists(dir + fnameNoExt + ".png") Then
+            Dim img = Image.FromFile(dir + fnameNoExt + ".png")
+            ImageList1.Images.Add(dir + fnameNoExt + ".png", img)
+            img.Dispose()
+
+            node.ImageKey = dir + fnameNoExt + ".png"
+            node.SelectedImageKey = dir + fnameNoExt + ".png"
+        End If
     End Sub
     Private Function load_content(f As String, node As TreeNode) As String
         Dim w As New StreamReader(f)
@@ -478,8 +555,8 @@ Public Class Form1
             End If
         End If
 
-        If e.Alt And Not e.Control And e.KeyCode = Keys.A Then ToolStripButton2_Click(ToolStripButton2, New EventArgs)
-        If e.Control And e.Alt And e.KeyCode = Keys.A Then ToolStripButton3_Click(ToolStripButton3, New EventArgs)
+        If e.Control And Not e.Alt And e.KeyCode = Keys.N Then ToolStripButton2_Click(ToolStripButton2, New EventArgs)
+        If e.Control And e.Alt And e.KeyCode = Keys.N Then ToolStripButton3_Click(ToolStripButton3, New EventArgs)
         If e.Control And e.Alt And e.KeyCode = Keys.D Then ToolStripButton4_Click(ToolStripButton4, New EventArgs)
         If e.Control And e.Alt And e.KeyCode = Keys.R Then ToolStripButton20_Click(ToolStripButton20, New EventArgs)
 
@@ -520,6 +597,15 @@ Public Class Form1
             nodeForContextMenu = e.Node
             colorForContextMenu = e.Node.BackColor
             e.Node.BackColor = Color.LightGray
+            If e.Node.FullPath.ToUpper.StartsWith("!!!BACKUPS\") And e.Node.FullPath.Count(Function(ch As Char) ch = "\") >= 2 Then
+                RestoreFromBackupToolStripMenuItem.Visible = True
+                CompareWithcurrentToolStripMenuItem.Visible = True
+                ToolStripSeparator10.Visible = True
+            Else
+                RestoreFromBackupToolStripMenuItem.Visible = False
+                CompareWithcurrentToolStripMenuItem.Visible = False
+                ToolStripSeparator10.Visible = False
+            End If
             ContextMenu_treeNode.Show(Cursor.Position)
 
             'If e.Node Is TreeView1.SelectedNode Then Exit Sub
@@ -959,6 +1045,7 @@ Public Class Form1
 
         'rename if needed
         If CheckBox1.Checked Then
+            nodeForContextMenu2 = Nothing
             If ToolStripButton20_Click(ToolStripButton20, New EventArgs) = "" Then
                 'delete if renaming canceled
                 ToolStripButton4_Click(ToolStripButton4, New EventArgs)
@@ -984,6 +1071,7 @@ Public Class Form1
 
         'rename if needed
         If CheckBox1.Checked Then
+            nodeForContextMenu2 = Nothing
             If ToolStripButton20_Click(ToolStripButton20, New EventArgs) = "" Then
                 'delete if renaming canceled
                 ToolStripButton4_Click(ToolStripButton4, New EventArgs)
@@ -1945,6 +2033,14 @@ Public Class Form1
             FileCopy(f, SAVE_PATH + "\!!!Backups\" + b + "\" + Path.GetFileName(f))
         Next
 
+        If backupNode Is Nothing Then backupNode = New TreeNode With {.Name = "!!!Backups", .Text = "!!!Backups"}
+        If Not TreeView1.Nodes.Contains(backupNode) Then TreeView1.Nodes.Add(backupNode)
+        For Each f In GetFiles(SAVE_PATH + "\!!!Backups\" + b, FileIO.SearchOption.SearchAllSubDirectories, {"*.zam"})
+            load_node(f)
+        Next
+        If Not ShowBackupsInTreeToolStripMenuItem.Checked Then backupNode.Remove()
+
+
         Dim str = DateTime.Parse(now).ToLongDateString + " " + DateTime.Parse(now).ToLongTimeString
         Dim i = DirectCast(BackupsToolStripMenuItem.DropDownItems.Add(str), ToolStripMenuItem)
         Dim tmp = i.DropDownItems.Add("Restore Overwrite")
@@ -2054,6 +2150,33 @@ Public Class Form1
     Dim colorForContextMenu As Color
     Dim nodeForContextMenu As TreeNode = Nothing
     Dim nodeForContextMenu2 As TreeNode = Nothing
+    'Compare with current (for backup nodes only)
+    Private Sub CompareWithcurrentToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles CompareWithcurrentToolStripMenuItem.Click
+        If nodeForContextMenu Is Nothing Then Exit Sub
+
+        Dim p = nodeForContextMenu.FullPath
+        If Not p.ToUpper.StartsWith("!!!BACKUPS") Or p.Count(Function(c) c = "\") < 2 Then MsgBox("Can only apply this command to a backup sub node.") : nodeForContextMenu = Nothing : Exit Sub
+
+        Dim node As TreeNode = Nothing
+        Dim path_list = p.Split("\").ToList
+        path_list.RemoveAt(0) : path_list.RemoveAt(0)
+        For Each path_part In path_list
+            If node Is Nothing Then node = TreeView1.Nodes(path_part) Else node = node.Nodes(path_part)
+            If node Is Nothing Then MsgBox("Original node: '" + String.Join("\", path_list) + "' doesn't seem to exist any more.") : nodeForContextMenu = Nothing : Exit Sub
+        Next
+
+        ToolStripMenuItem21_Click(ToolStripMenuItem21, New EventArgs, nodeForContextMenu, node)
+
+        nodeForContextMenu = Nothing
+        End Sub
+    'Restore from backup (for backup nodes only)
+    Private Sub RestoreFromBackupToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles RestoreFromBackupToolStripMenuItem.Click
+        If nodeForContextMenu Is Nothing Then Exit Sub
+
+
+
+        nodeForContextMenu = Nothing
+    End Sub
     'Open in new tab
     Private Sub OpenInNewTabToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles OpenInNewTabToolStripMenuItem.Click
         'If TreeView1.SelectedNode IsNot Nothing Then openNote(TreeView1.SelectedNode, True)
@@ -2144,24 +2267,26 @@ Public Class Form1
         End If
     End Sub
     'Compare with selected
-    Private Sub ToolStripMenuItem21_Click(sender As Object, e As EventArgs) Handles ToolStripMenuItem21.Click
-        If nodeForContextMenu Is Nothing Then Exit Sub
-        If TreeView1.SelectedNode Is Nothing Then Exit Sub
-        If nodeForContextMenu Is TreeView1.SelectedNode Then MsgBox("Cant compare '" + nodeForContextMenu.Text + "' with itself. You must select a node, then right click on another node to compare them.") : Exit Sub
+    Private Sub ToolStripMenuItem21_Click(sender As Object, e As EventArgs, Optional n1 As TreeNode = Nothing, Optional n2 As TreeNode = Nothing) Handles ToolStripMenuItem21.Click
+        If n1 Is Nothing Or n2 Is Nothing Then n1 = TreeView1.SelectedNode : n2 = nodeForContextMenu
+
+        If n1 Is Nothing Then nodeForContextMenu = Nothing : Exit Sub
+        If n2 Is Nothing Then nodeForContextMenu = Nothing : Exit Sub
+        If n1 Is n2 Then MsgBox("Cant compare '" + n2.Text + "' with itself. You must select a node, then right click on another node to compare them.") : nodeForContextMenu = Nothing : Exit Sub
 
         Dim rtf1 = New RichTextBox
         Dim rtf2 = New RichTextBox
 
-        If content(TreeView1.SelectedNode).Contains("{%%%UNLOADED%%%") Then
-            Dim f = SAVE_PATH + "\" + TreeView1.SelectedNode.FullPath + ".zam"
-            If FileExists(f) Then content(TreeView1.SelectedNode) = load_content(f, TreeView1.SelectedNode)
+        If content(n1).Contains("{%%%UNLOADED%%%") Then
+            Dim f = SAVE_PATH + "\" + n1.FullPath + ".zam"
+            If FileExists(f) Then content(n1) = load_content(f, n1)
         End If
-        If content(nodeForContextMenu).Contains("{%%%UNLOADED%%%") Then
-            Dim f = SAVE_PATH + "\" + nodeForContextMenu.FullPath + ".zam"
-            If FileExists(f) Then content(nodeForContextMenu) = load_content(f, nodeForContextMenu)
+        If content(n2).Contains("{%%%UNLOADED%%%") Then
+            Dim f = SAVE_PATH + "\" + n2.FullPath + ".zam"
+            If FileExists(f) Then content(n2) = load_content(f, n2)
         End If
-        rtf1.Rtf = content(TreeView1.SelectedNode)
-        rtf2.Rtf = content(nodeForContextMenu)
+        rtf1.Rtf = content(n1)
+        rtf2.Rtf = content(n2)
 
         Dim diff = New DiffMatchPatch.diff_match_patch
         Dim diffs = diff.diff_main(rtf1.Text, rtf2.Text)
@@ -2191,6 +2316,8 @@ Public Class Form1
         splt.Panel1.Controls.Add(rtf1) : splt.Panel2.Controls.Add(rtf2)
         rtf1.Dock = DockStyle.Fill : rtf2.Dock = DockStyle.Fill
         TabControl1.SelectedTab = tab
+
+        nodeForContextMenu = Nothing
     End Sub
     'Set fore color
     Private Sub setForeColor(sender As Object, e As EventArgs)

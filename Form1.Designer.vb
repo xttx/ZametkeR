@@ -1559,7 +1559,7 @@ Partial Class Form1
         '
         Me.ContextMenu_treeNode.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.RestoreFromBackupToolStripMenuItem, Me.CompareWithcurrentToolStripMenuItem, Me.ToolStripSeparator10, Me.OpenInNewTabToolStripMenuItem, Me.OpenAllChildrenToolStripMenuItem, Me.ToolStripMenuItem4, Me.AddToolStripMenuItem, Me.AddChildToolStripMenuItem, Me.CloneToolStripMenuItem, Me.RenameToolStripMenuItem, Me.DeleteToolStripMenuItem, Me.CopyAsFileToolStripMenuItem, Me.ToolStripMenuItem17, Me.SortChildrensToolStripMenuItem, Me.ToolStripMenuItem21, Me.ToolStripMenuItem2, Me.SetNoteForeColorToolStripMenuItem, Me.SetNoteBackColorToolStripMenuItem, Me.SetCustomIconToolStripMenuItem, Me.ToolStripMenuItem3, Me.PastAsNewNoteToolStripMenuItem})
         Me.ContextMenu_treeNode.Name = "ContextMenuStrip1"
-        Me.ContextMenu_treeNode.Size = New System.Drawing.Size(196, 386)
+        Me.ContextMenu_treeNode.Size = New System.Drawing.Size(196, 408)
         '
         'RestoreFromBackupToolStripMenuItem
         '
