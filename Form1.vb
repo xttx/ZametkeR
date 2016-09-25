@@ -779,10 +779,12 @@ Public Class Form1
         AddHandler rtf.MouseLeave, AddressOf rtf_mouseOut
         AddHandler rtf.MouseClick, AddressOf rtf_mouseClick
         AddHandler rtf.MouseWheel, AddressOf rtf_MouseWheel
+        AddHandler rtf.LinkClicked, Sub(sender As Object, e As LinkClickedEventArgs) System.Diagnostics.Process.Start(e.LinkText)
         rtf.ContextMenuStrip = ContextMenu_text
         rtf.Dock = DockStyle.Fill
         rtf.HideSelection = False
         rtf.AcceptsTab = True
+        rtf.DetectUrls = True
         tabpage.Controls.Add(rtf)
         content_associatedNodes.Add(rtf, node)
         Return rtf
