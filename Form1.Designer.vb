@@ -64,6 +64,7 @@ Partial Class Form1
         Me.TxtExpottToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.CurrentToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.AllToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.PreviewPrintToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripMenuItem1 = New System.Windows.Forms.ToolStripSeparator()
         Me.ExitToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.EditToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
@@ -167,6 +168,7 @@ Partial Class Form1
         Me.ToolStripButton23 = New System.Windows.Forms.ToolStripButton()
         Me.ToolStripButton24 = New System.Windows.Forms.ToolStripButton()
         Me.ToolStripButton28 = New System.Windows.Forms.ToolStripButton()
+        Me.ToolStripButton31 = New System.Windows.Forms.ToolStripButton()
         Me.TreeView1 = New System.Windows.Forms.TreeView()
         Me.ImageList1 = New System.Windows.Forms.ImageList(Me.components)
         Me.ContextMenu_treeNode = New System.Windows.Forms.ContextMenuStrip(Me.components)
@@ -198,7 +200,6 @@ Partial Class Form1
         Me.MenuItem_resetFont = New System.Windows.Forms.ToolStripMenuItem()
         Me.MenuItem_resetColors = New System.Windows.Forms.ToolStripMenuItem()
         Me.MenuItem_pass = New System.Windows.Forms.ToolStripMenuItem()
-        Me.PreviewPrintToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.TabControl1.SuspendLayout()
         Me.TabPageOptions.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
@@ -227,7 +228,7 @@ Partial Class Form1
         Me.TabControl1.Location = New System.Drawing.Point(0, 0)
         Me.TabControl1.Name = "TabControl1"
         Me.TabControl1.SelectedIndex = 0
-        Me.TabControl1.Size = New System.Drawing.Size(583, 353)
+        Me.TabControl1.Size = New System.Drawing.Size(563, 353)
         Me.TabControl1.SizeMode = System.Windows.Forms.TabSizeMode.Fixed
         Me.TabControl1.TabIndex = 0
         '
@@ -257,7 +258,7 @@ Partial Class Form1
         Me.TabPageOptions.Controls.Add(Me.Label1)
         Me.TabPageOptions.Location = New System.Drawing.Point(4, 22)
         Me.TabPageOptions.Name = "TabPageOptions"
-        Me.TabPageOptions.Size = New System.Drawing.Size(575, 327)
+        Me.TabPageOptions.Size = New System.Drawing.Size(555, 327)
         Me.TabPageOptions.TabIndex = 0
         Me.TabPageOptions.Text = "Options"
         '
@@ -633,7 +634,7 @@ Partial Class Form1
         '
         Me.TxtExpottToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.CurrentToolStripMenuItem, Me.AllToolStripMenuItem})
         Me.TxtExpottToolStripMenuItem.Name = "TxtExpottToolStripMenuItem"
-        Me.TxtExpottToolStripMenuItem.Size = New System.Drawing.Size(158, 22)
+        Me.TxtExpottToolStripMenuItem.Size = New System.Drawing.Size(168, 22)
         Me.TxtExpottToolStripMenuItem.Text = "Txt Export"
         '
         'CurrentToolStripMenuItem
@@ -648,15 +649,21 @@ Partial Class Form1
         Me.AllToolStripMenuItem.Size = New System.Drawing.Size(114, 22)
         Me.AllToolStripMenuItem.Text = "All"
         '
+        'PreviewPrintToolStripMenuItem
+        '
+        Me.PreviewPrintToolStripMenuItem.Name = "PreviewPrintToolStripMenuItem"
+        Me.PreviewPrintToolStripMenuItem.Size = New System.Drawing.Size(168, 22)
+        Me.PreviewPrintToolStripMenuItem.Text = "Preview && Print ..."
+        '
         'ToolStripMenuItem1
         '
         Me.ToolStripMenuItem1.Name = "ToolStripMenuItem1"
-        Me.ToolStripMenuItem1.Size = New System.Drawing.Size(155, 6)
+        Me.ToolStripMenuItem1.Size = New System.Drawing.Size(165, 6)
         '
         'ExitToolStripMenuItem
         '
         Me.ExitToolStripMenuItem.Name = "ExitToolStripMenuItem"
-        Me.ExitToolStripMenuItem.Size = New System.Drawing.Size(158, 22)
+        Me.ExitToolStripMenuItem.Size = New System.Drawing.Size(168, 22)
         Me.ExitToolStripMenuItem.Text = "Exit"
         '
         'EditToolStripMenuItem
@@ -1039,6 +1046,7 @@ Partial Class Form1
         Me.ToolStripButton19.Size = New System.Drawing.Size(23, 22)
         Me.ToolStripButton19.Text = "ToolStripButton19"
         Me.ToolStripButton19.ToolTipText = "Search all notes"
+        Me.ToolStripButton19.Visible = False
         '
         'ToolStripButton22
         '
@@ -1106,7 +1114,7 @@ Partial Class Form1
         Me.ToolStripButton30.Name = "ToolStripButton30"
         Me.ToolStripButton30.Size = New System.Drawing.Size(23, 22)
         Me.ToolStripButton30.Text = "ToolStripButton30"
-        Me.ToolStripButton30.ToolTipText = "Move tableft"
+        Me.ToolStripButton30.ToolTipText = "Move tab left"
         '
         'SplitContainer1
         '
@@ -1128,7 +1136,7 @@ Partial Class Form1
         '
         Me.SplitContainer1.Panel2.Controls.Add(Me.TabControl1)
         Me.SplitContainer1.Size = New System.Drawing.Size(837, 353)
-        Me.SplitContainer1.SplitterDistance = 250
+        Me.SplitContainer1.SplitterDistance = 270
         Me.SplitContainer1.TabIndex = 3
         '
         'Button2
@@ -1155,7 +1163,7 @@ Partial Class Form1
         'Button1
         '
         Me.Button1.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.Button1.Location = New System.Drawing.Point(220, 2)
+        Me.Button1.Location = New System.Drawing.Point(240, 2)
         Me.Button1.Name = "Button1"
         Me.Button1.Size = New System.Drawing.Size(30, 25)
         Me.Button1.TabIndex = 21
@@ -1433,10 +1441,10 @@ Partial Class Form1
         'ToolStrip2
         '
         Me.ToolStrip2.Dock = System.Windows.Forms.DockStyle.Bottom
-        Me.ToolStrip2.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripButton2, Me.ToolStripButton3, Me.ToolStripButton21, Me.ToolStripSeparator1, Me.ToolStripButton4, Me.ToolStripButton20, Me.ToolStripSeparator8, Me.ToolStripButton23, Me.ToolStripButton24, Me.ToolStripButton28})
+        Me.ToolStrip2.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripButton2, Me.ToolStripButton3, Me.ToolStripButton21, Me.ToolStripSeparator1, Me.ToolStripButton4, Me.ToolStripButton20, Me.ToolStripSeparator8, Me.ToolStripButton23, Me.ToolStripButton24, Me.ToolStripButton28, Me.ToolStripButton31})
         Me.ToolStrip2.Location = New System.Drawing.Point(0, 328)
         Me.ToolStrip2.Name = "ToolStrip2"
-        Me.ToolStrip2.Size = New System.Drawing.Size(250, 25)
+        Me.ToolStrip2.Size = New System.Drawing.Size(270, 25)
         Me.ToolStrip2.TabIndex = 1
         Me.ToolStrip2.Text = "ToolStrip2"
         '
@@ -1531,6 +1539,15 @@ Partial Class Form1
         Me.ToolStripButton28.Text = "Move page one level up"
         Me.ToolStripButton28.ToolTipText = "Move page one level up"
         '
+        'ToolStripButton31
+        '
+        Me.ToolStripButton31.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
+        Me.ToolStripButton31.Image = CType(resources.GetObject("ToolStripButton31.Image"), System.Drawing.Image)
+        Me.ToolStripButton31.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.ToolStripButton31.Name = "ToolStripButton31"
+        Me.ToolStripButton31.Size = New System.Drawing.Size(23, 22)
+        Me.ToolStripButton31.Text = "ToolStripButton31"
+        '
         'TreeView1
         '
         Me.TreeView1.AllowDrop = True
@@ -1543,7 +1560,7 @@ Partial Class Form1
         Me.TreeView1.Location = New System.Drawing.Point(0, 0)
         Me.TreeView1.Name = "TreeView1"
         Me.TreeView1.SelectedImageIndex = 3
-        Me.TreeView1.Size = New System.Drawing.Size(250, 331)
+        Me.TreeView1.Size = New System.Drawing.Size(270, 331)
         Me.TreeView1.TabIndex = 0
         '
         'ImageList1
@@ -1551,15 +1568,17 @@ Partial Class Form1
         Me.ImageList1.ImageStream = CType(resources.GetObject("ImageList1.ImageStream"), System.Windows.Forms.ImageListStreamer)
         Me.ImageList1.TransparentColor = System.Drawing.Color.Transparent
         Me.ImageList1.Images.SetKeyName(0, "encrypt.png")
-        Me.ImageList1.Images.SetKeyName(1, "encrypt_enabled.png")
+        Me.ImageList1.Images.SetKeyName(1, "encrypton.png")
         Me.ImageList1.Images.SetKeyName(2, "folder.png")
-        Me.ImageList1.Images.SetKeyName(3, "note.png")
+        Me.ImageList1.Images.SetKeyName(3, "document.png")
+        Me.ImageList1.Images.SetKeyName(4, "folder.png")
+        Me.ImageList1.Images.SetKeyName(5, "note.png")
         '
         'ContextMenu_treeNode
         '
         Me.ContextMenu_treeNode.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.RestoreFromBackupToolStripMenuItem, Me.CompareWithcurrentToolStripMenuItem, Me.ToolStripSeparator10, Me.OpenInNewTabToolStripMenuItem, Me.OpenAllChildrenToolStripMenuItem, Me.ToolStripMenuItem4, Me.AddToolStripMenuItem, Me.AddChildToolStripMenuItem, Me.CloneToolStripMenuItem, Me.RenameToolStripMenuItem, Me.DeleteToolStripMenuItem, Me.CopyAsFileToolStripMenuItem, Me.ToolStripMenuItem17, Me.SortChildrensToolStripMenuItem, Me.ToolStripMenuItem21, Me.ToolStripMenuItem2, Me.SetNoteForeColorToolStripMenuItem, Me.SetNoteBackColorToolStripMenuItem, Me.SetCustomIconToolStripMenuItem, Me.ToolStripMenuItem3, Me.PastAsNewNoteToolStripMenuItem})
         Me.ContextMenu_treeNode.Name = "ContextMenuStrip1"
-        Me.ContextMenu_treeNode.Size = New System.Drawing.Size(196, 408)
+        Me.ContextMenu_treeNode.Size = New System.Drawing.Size(196, 386)
         '
         'RestoreFromBackupToolStripMenuItem
         '
@@ -1726,12 +1745,6 @@ Partial Class Form1
         Me.MenuItem_pass.Name = "MenuItem_pass"
         Me.MenuItem_pass.Size = New System.Drawing.Size(157, 22)
         Me.MenuItem_pass.Text = "Set as password"
-        '
-        'PreviewPrintToolStripMenuItem
-        '
-        Me.PreviewPrintToolStripMenuItem.Name = "PreviewPrintToolStripMenuItem"
-        Me.PreviewPrintToolStripMenuItem.Size = New System.Drawing.Size(168, 22)
-        Me.PreviewPrintToolStripMenuItem.Text = "Preview && Print ..."
         '
         'Form1
         '
@@ -1951,4 +1964,5 @@ Partial Class Form1
     Friend WithEvents Button2 As Button
     Friend WithEvents ToolStripMenuItem21 As ToolStripMenuItem
     Friend WithEvents PreviewPrintToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents ToolStripButton31 As ToolStripButton
 End Class

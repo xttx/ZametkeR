@@ -16,6 +16,7 @@ Public Class Form1
     Dim crypt As New Cryptography("xus.ebr#usp//4u(hec*aT#hucharuzAC$cru")
     Dim content As New Dictionary(Of TreeNode, String)
     Dim content_bgcolor As New Dictionary(Of TreeNode, Color)
+    Dim content_spoilers As New Dictionary(Of TreeNode, List(Of String))
     Dim content_notSaved As New List(Of TreeNode)
     Dim content_needCrypt As New List(Of TreeNode)
     Dim content_associatedNodes As New Dictionary(Of RichTextBox, TreeNode)
@@ -183,6 +184,7 @@ Public Class Form1
             If UseTrayToolStripMenuItem.Checked And MinimizeToTrayToolStripMenuItem.Checked Then
                 refr = True
                 Me.Close()
+                Exit Sub
             End If
         End If
 
@@ -253,80 +255,6 @@ Public Class Form1
 
         For Each f In files
             load_node(f)
-            'Dim node As TreeNode = Nothing
-            'Dim fname = f.Substring(f.LastIndexOf("\") + 1)
-            'Dim fnameNoExt = fname.Substring(0, fname.LastIndexOf("."))
-            'Dim dir = f.Substring(0, f.LastIndexOf("\"))
-            'dir = GetDirectoryInfo(dir).FullName
-            'If Not dir.EndsWith("\") Then dir = dir + "\"
-            'Dim dir_rel = dir.Substring(dir_root.Length).Trim
-            'If Not dir_rel.EndsWith("\") Then dir_rel = dir_rel + "\"
-
-            'If dir_rel = "\" Then
-            '    node = TreeView1.Nodes.Add(fnameNoExt, fnameNoExt) : content.Add(node, "") : node.ImageIndex = 3 : node.SelectedImageIndex = 3
-            'Else
-            '    dir_rel += fnameNoExt
-            '    For Each path As String In dir_rel.Split("\"c)
-            '        If node Is Nothing Then
-            '            node = TreeView1.Nodes(path)
-            '            If node Is Nothing Then node = TreeView1.Nodes.Add(path, path) : content.Add(node, "") : node.ImageIndex = 3 : node.SelectedImageIndex = 3
-            '        Else
-            '            If node.Nodes(path) Is Nothing Then
-            '                If node.ImageKey = "" Then node.ImageIndex = 2 : node.SelectedImageIndex = 2
-            '                node = node.Nodes.Add(path, path) : content.Add(node, "") : node.ImageIndex = 3 : node.SelectedImageIndex = 3
-            '            Else
-            '                node = node.Nodes(path)
-            '            End If
-            '        End If
-            '    Next
-            'End If
-
-            'Dim isReminder As Boolean = node.Text.ToUpper = "REMINDERS"
-            'isReminder = isReminder Or (node.Parent IsNot Nothing AndAlso node.Parent.Text.ToUpper = "REMINDERS")
-            'isReminder = isReminder And Not node.FullPath.ToUpper.StartsWith("!!!BACKUPS")
-            'If CheckBox3.Checked And Not isReminder Then
-            '    content(node) = "{%%%UNLOADED%%%}"
-            'Else
-            '    Dim tmp = load_content(f, node)
-            '    content(node) = tmp
-
-            '    'reminder check
-            '    If node.Text.ToUpper = "REMINDERS" Then
-            '        node.BackColor = Color.LightBlue
-            '        Dim tmprtf As New RichTextBox
-            '        If tmp.ToUpper.StartsWith("{\RTF") Then
-            '            tmprtf.Rtf = tmp
-            '        Else
-            '            tmprtf.Text = tmp
-            '        End If
-            '        checkReminders(tmprtf)
-            '    End If
-
-            '    If node.Parent IsNot Nothing AndAlso node.Parent.Text.ToUpper = "REMINDERS" Then
-            '        node.ForeColor = Color.Aqua
-            '        Dim tmprtf As New RichTextBox
-            '        If tmp.ToUpper.StartsWith("{\RTF") Then
-            '            tmprtf.Rtf = tmp
-            '        Else
-            '            tmprtf.Text = tmp
-            '        End If
-            '        checkRemindersAstralis(tmprtf, node)
-            '    End If
-            '    'END reminder check
-            'End If
-
-            ''Need to be loaded unconditionally, because it show node colors
-            'load_bcg(f, node)
-
-            ''custom icon
-            'If FileExists(dir + fnameNoExt + ".png") Then
-            '    Dim img = Image.FromFile(dir + fnameNoExt + ".png")
-            '    ImageList1.Images.Add(dir + fnameNoExt + ".png", img)
-            '    img.Dispose()
-
-            '    node.ImageKey = dir + fnameNoExt + ".png"
-            '    node.SelectedImageKey = dir + fnameNoExt + ".png"
-            'End If
         Next
 
         'expand nodes
@@ -427,7 +355,30 @@ Public Class Form1
         If tmp.StartsWith("CRYPF:") Then content_needCrypt.Add(node)
         If tmp.StartsWith("CRYPF:") Or tmp.StartsWith("CRYPR:") Then tmp = crypt.DecryptData(tmp.Substring(6))
         w.Close()
-        Return tmp
+
+        'handle spoilers
+        Dim rtf As New RichTextBox
+        If tmp.ToUpper.StartsWith("{\RTF") Then rtf.Rtf = tmp Else rtf.Text = tmp
+        Dim start As Integer = rtf.Text.Length - 1
+        Dim spoilers As New List(Of String)
+        Do While start >= 0 AndAlso rtf.Text.ToUpper.LastIndexOf("[%SPOILER%]", start) >= 0
+            Dim spl_start_pos = rtf.Text.ToUpper.LastIndexOf("[%SPOILER%]", start) + 11
+            Dim spl_end_pos = rtf.Text.ToUpper.IndexOf("[/SPOILER]", spl_start_pos)
+            If spl_end_pos = -1 Then spl_end_pos = rtf.Text.Length
+            spoilers.Add(rtf.Text.Substring(spl_start_pos, spl_end_pos - spl_start_pos))
+            rtf.SelectionStart = spl_start_pos - 11
+            rtf.SelectionLength = spl_end_pos - spl_start_pos + 10 + 11
+            start = spl_start_pos - 12
+            rtf.SelectedText = "[SPOILER]"
+        Loop
+        spoilers.Reverse()
+        If spoilers.Count > 0 Then
+            If Not content_spoilers.ContainsKey(node) Then content_spoilers.Add(node, spoilers) Else content_spoilers(node) = spoilers
+        Else
+            If content_spoilers.ContainsKey(node) Then content_spoilers.Remove(node)
+        End If
+
+        Return rtf.Rtf
     End Function
     Private Sub load_bcg(fZam As String, node As TreeNode)
         Dim bcg = fZam.Substring(0, fZam.Length - 4) + ".bcg"
@@ -776,7 +727,7 @@ Public Class Form1
         AddHandler rtf.TextChanged, AddressOf rtf_TextChanged
         AddHandler rtf.SelectionChanged, AddressOf rtf_SelectionChanged
         AddHandler rtf.MouseMove, AddressOf rtf_mouseMove
-        AddHandler rtf.MouseLeave, AddressOf rtf_mouseOut
+        'AddHandler rtf.MouseLeave, AddressOf rtf_mouseOut
         AddHandler rtf.MouseClick, AddressOf rtf_mouseClick
         AddHandler rtf.MouseWheel, AddressOf rtf_MouseWheel
         AddHandler rtf.LinkClicked, Sub(sender As Object, e As LinkClickedEventArgs) System.Diagnostics.Process.Start(e.LinkText)
@@ -825,9 +776,13 @@ Public Class Form1
         If w_end1 < 0 Then w_end1 = txt.Length
         If w_end1 - w_str1 > 0 Then
             Dim substr = txt.Substring(w_str1, w_end1 - w_str1).Trim.ToUpper
-            If substr = "{SPOILER}" Or substr = "{%SPOILER%}" Then Cursor = Cursors.Hand Else Cursor = Cursors.IBeam
+            If substr.StartsWith("[SPOILER]") Or substr.StartsWith("[%SPOILER%]") Then
+                rtf.Cursor = Cursors.Hand
+            Else
+                rtf.Cursor = Cursors.IBeam
+            End If
         Else
-            Cursor = Cursors.IBeam
+            rtf.Cursor = Cursors.IBeam
         End If
 
         If rtf.SelectionType = RichTextBoxSelectionTypes.Object AndAlso rtf.SelectionLength = 1 Then
@@ -862,9 +817,6 @@ Public Class Form1
         End If
         If CheckBox8.Checked And Not rtf.Focused Then rtf.Select()
     End Sub
-    Private Sub rtf_mouseOut()
-        Cursor = Cursors.Default
-    End Sub
     'Handle spoilers and context menus
     Private Sub rtf_mouseClick(sender As Object, e As MouseEventArgs)
         Dim rtf = DirectCast(sender, RichTextBox)
@@ -879,22 +831,47 @@ Public Class Form1
         If (w_end2 < w_end1 And w_end2 > w_str1) Or w_end1 < 1 Then w_end1 = w_end2
         If w_end1 < 0 Then w_end1 = txt.Length
         If w_end1 - w_str1 > 0 Then
-            If txt.Substring(w_str1, w_end1 - w_str1).Trim.ToUpper = "{SPOILER}" Then
-                rtf.Select(w_str1, w_end1 - w_str1)
-                Clipboard.SetText("{%SPOILER%}")
+            If txt.Substring(w_str1, w_end1 - w_str1).Trim.ToUpper.StartsWith("[SPOILER]") Then
+                Dim spoilerNum As Integer = txt.Substring(0, w_str1).ToUpper.Split({"[SPOILER]"}, StringSplitOptions.None).Count - 1
+                spoilerNum += txt.Substring(0, w_str1).ToUpper.Split({"[%SPOILER%]"}, StringSplitOptions.None).Count - 1
+
+                rtf.Select(w_str1, 9)
+                Clipboard.SetText("[%SPOILER%]")
                 rtf.Paste()
 
                 rtf.Select(w_end1 + 2, 0)
-                Clipboard.SetText(" { abraabraabra }")
-                'Clipboard.SetText(vbCrLf + "{ abraabraabra }")
-                'Clipboard.SetText(vbCrLf + "{" + vbCrLf + "abraabraabra" + vbCrLf + "}")
+                Clipboard.SetText("[/SPOILER]")
+                If content_spoilers.ContainsKey(content_associatedNodes(rtf)) Then
+                    Dim list = content_spoilers(content_associatedNodes(rtf))
+                    If list IsNot Nothing AndAlso list.Count > spoilerNum Then
+                        Clipboard.SetText(list(spoilerNum) + "[/SPOILER]")
+                    End If
+                End If
                 rtf.Paste()
-            ElseIf txt.Substring(w_str1, w_end1 - w_str1).Trim.ToUpper = "{%SPOILER%}" Then
-                rtf.Select(w_str1, w_end1 - w_str1)
-                Clipboard.SetText("{SPOILER}")
+            ElseIf txt.Substring(w_str1, w_end1 - w_str1).Trim.ToUpper.StartsWith("[%SPOILER%]") Then
+                Dim spoilerNum As Integer = txt.Substring(0, w_str1).ToUpper.Split({"[SPOILER]"}, StringSplitOptions.None).Count - 1
+                spoilerNum += txt.Substring(0, w_str1).ToUpper.Split({"[%SPOILER%]"}, StringSplitOptions.None).Count - 1
+
+                rtf.Select(w_str1, 11)
+                Clipboard.SetText("[SPOILER]")
                 rtf.Paste()
 
-                rtf.Select(w_end1 - 1, txt.IndexOf("}", w_end1) - (w_end1 - 1))
+                If Not content_spoilers.ContainsKey(content_associatedNodes(rtf)) Then content_spoilers.Add(content_associatedNodes(rtf), New List(Of String))
+                Dim list = content_spoilers(content_associatedNodes(rtf))
+                If list Is Nothing Then list = New List(Of String)
+                Do While list.Count <= spoilerNum
+                    list.Add("")
+                Loop
+
+                Dim sp_end = txt.ToUpper.IndexOf("[/SPOILER]", w_str1)
+                If sp_end = -1 Then
+                    sp_end = txt.Length
+                    list(spoilerNum) = rtf.Text.Substring(w_str1 + 9, sp_end - (w_str1 + 9) - 2)
+                    rtf.Select(w_str1 + 9, sp_end - (w_str1 + 9) - 2)
+                Else
+                    list(spoilerNum) = rtf.Text.Substring(w_str1 + 9, sp_end - (w_str1 + 9) - 2)
+                    rtf.Select(w_str1 + 9, sp_end - (w_str1 + 9) - 2 + 10)
+                End If
                 rtf.SelectedText = ""
             End If
         End If
@@ -1268,6 +1245,10 @@ Public Class Form1
         node.Remove()
         nodes.Insert(ind, node)
         TreeView1.SelectedNode = node
+    End Sub
+    'Global search
+    Private Sub ToolStripButton31_Click(sender As Object, e As EventArgs) Handles ToolStripButton31.Click
+        ToolStripButton19_Click(sender, e)
     End Sub
     'getNewName - CheckAvailName
     Private Function getNewName(node As TreeNode, name As String, Optional checkInsideNode As Boolean = False)
