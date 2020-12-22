@@ -13,7 +13,7 @@
         System.IO.Directory.SetCurrentDirectory(Application.StartupPath)
         ini.path = (".\ZametkeR.ini")
 
-        'Initialize the menus
+        'Initialize tray context menu
         mnuDisplayForm = New ToolStripMenuItem("Show")
         mnuSep1 = New ToolStripSeparator()
         mnuExit = New ToolStripMenuItem("Exit")

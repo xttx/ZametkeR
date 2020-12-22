@@ -20,6 +20,7 @@ Public Class Form1
     Dim content_notSaved As New List(Of TreeNode)
     Dim content_needCrypt As New List(Of TreeNode)
     Dim content_associatedNodes As New Dictionary(Of RichTextBox, TreeNode)
+    Dim content_scrolllPos As New Dictionary(Of TreeNode, Integer)
     Dim reminders As New Reminders
     Dim remindersText As String = ""
     Dim remindersAstralisText As String = ""
@@ -33,6 +34,7 @@ Public Class Form1
     Dim aalt As Boolean = False
     Dim ctrl As Boolean = False
     Dim shift As Boolean = False
+    Dim WithEvents ftp As New Class1_FTP
 
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         refr = True
@@ -137,6 +139,9 @@ Public Class Form1
         t = ini.IniReadValue("Main", "Save_tree_state")
         If t <> "0" And t.ToUpper <> "FALSE" And t <> "" Then CheckBox11.Checked = True
 
+        TextBox2.Text = ini.IniReadValue("Main", "Remote_Host").Trim
+        ftp.host = TextBox2.Text
+
         Dim rkz = Microsoft.Win32.Registry.CurrentUser.OpenSubKey("SOFTWARE\Microsoft\Windows\CurrentVersion\Run", True).GetValue("ZametkeR")
         If rkz IsNot Nothing AndAlso rkz <> "" Then CheckBox10.Checked = True Else CheckBox10.Checked = False
 
@@ -174,10 +179,10 @@ Public Class Form1
         If AutosaveOnExitToolStripMenuItem.Checked Then ToolStripButton1_Click(ToolStripButton1, New EventArgs)
         If refr Then Exit Sub
         If RememberLastPositionAndSizeToolStripMenuItem.Checked Then
-            ini.IniWriteValue("Main", "LastPos", Me.Left.ToString + ";" + Me.Top.ToString)
-            ini.IniWriteValue("Main", "LastSize", Me.Width.ToString + ";" + Me.Height.ToString)
+            If Me.Left >= 0 And Me.Top >= 0 Then ini.IniWriteValue("Main", "LastPos", Me.Left.ToString + ";" + Me.Top.ToString)
+            If Me.Width > 200 And Me.Height > 64 Then ini.IniWriteValue("Main", "LastSize", Me.Width.ToString + ";" + Me.Height.ToString)
         End If
-        If Not UseTrayToolStripMenuItem.Checked Or Not CloseToTrayToolStripMenuItem.Checked Then Application.Exit()
+        If Not UseTrayToolStripMenuItem.Checked Or Not CloseToTrayToolStripMenuItem.Checked Then Application.Exit() Else e.Cancel = True : Me.Hide()
     End Sub
     Private Sub Form1_Resize(sender As Object, e As EventArgs) Handles Me.Resize
         If WindowState = FormWindowState.Minimized Then
@@ -585,9 +590,6 @@ Public Class Form1
             pastAsNewNote()
         End If
         If e.KeyCode = Keys.Delete And TreeView1.SelectedNode IsNot Nothing Then
-            If CheckBox4.Checked Then
-                If MsgBox("Delete " + TreeView1.SelectedNode.Text + " and all its children?", MsgBoxStyle.YesNo) <> MsgBoxResult.Yes Then Exit Sub
-            End If
             ToolStripButton4_Click(ToolStripButton4, New EventArgs)
             TreeView1.Select()
         End If
@@ -696,7 +698,7 @@ Public Class Form1
             Dim f = rtf.Font
             rtf.Font = New Font(f.FontFamily, CSng(ComboBox1.SelectedItem.ToString), f.Style)
             rtf.SelectionFont = New Font(f.FontFamily, CSng(ComboBox1.SelectedItem.ToString), f.Style)
-            'Update toolbar controls. MAYBE THIS NEED TO BE MOVED OUT OF IF TO UPDATE CONTROLS UNCONDITIONALLY
+            'Update toolbar controls. MAYBE THIS NEED TO BE MOVED OUT OF "IF" TO UPDATE CONTROLS UNCONDITIONALLY
             rtf_SelectionChanged(rtf, New EventArgs)
         End If
 
@@ -707,6 +709,12 @@ Public Class Form1
         End If
 
         If content_bgcolor.ContainsKey(node) Then rtf.BackColor = content_bgcolor(node) Else rtf.BackColor = Color.White
+
+        'Scroll to last position
+        If content_scrolllPos.ContainsKey(node) Then
+            rtf.Select(content_scrolllPos(node), 0)
+            rtf.ScrollToCaret()
+        End If
 
         'Check reminder
         If node.Text.ToUpper = "REMINDERS" Then checkReminders(rtf)
@@ -731,6 +739,12 @@ Public Class Form1
         AddHandler rtf.MouseClick, AddressOf rtf_mouseClick
         AddHandler rtf.MouseWheel, AddressOf rtf_MouseWheel
         AddHandler rtf.LinkClicked, Sub(sender As Object, e As LinkClickedEventArgs) System.Diagnostics.Process.Start(e.LinkText)
+        AddHandler rtf.VScroll, Sub(sender As Object, e As EventArgs)
+                                    Dim r = DirectCast(sender, RichTextBox)
+                                    Dim t = content_associatedNodes(r)
+                                    If Not content_scrolllPos.ContainsKey(t) Then content_scrolllPos.Add(t, 0)
+                                    content_scrolllPos(t) = r.GetCharIndexFromPosition(New Point(0, 0))
+                                End Sub
         rtf.ContextMenuStrip = ContextMenu_text
         rtf.Dock = DockStyle.Fill
         rtf.HideSelection = False
@@ -998,7 +1012,7 @@ Public Class Form1
 
     'Add page
     Private Sub ToolStripButton2_Click(sender As Object, e As EventArgs, Optional new_name As String = "", Optional _content As String = "") Handles ToolStripButton2.Click
-        Dim c As Integer = 0
+        'Dim c As Integer = 0
         Dim node_main As TreeNode = nodeForContextMenu2
         If node_main Is Nothing Then node_main = TreeView1.SelectedNode
 
@@ -1027,7 +1041,7 @@ Public Class Form1
             nodeForContextMenu2 = Nothing
             If ToolStripButton20_Click(ToolStripButton20, New EventArgs) = "" Then
                 'delete if renaming canceled
-                ToolStripButton4_Click(ToolStripButton4, New EventArgs)
+                ToolStripButton4_Click(ToolStripButton4, New EventArgs, True)
             End If
         End If
     End Sub
@@ -1053,12 +1067,16 @@ Public Class Form1
             nodeForContextMenu2 = Nothing
             If ToolStripButton20_Click(ToolStripButton20, New EventArgs) = "" Then
                 'delete if renaming canceled
-                ToolStripButton4_Click(ToolStripButton4, New EventArgs)
+                ToolStripButton4_Click(ToolStripButton4, New EventArgs, True)
             End If
         End If
     End Sub
     'Remove page
-    Private Sub ToolStripButton4_Click(sender As Object, e As EventArgs) Handles ToolStripButton4.Click
+    Private Sub ToolStripButton4_Click(sender As Object, e As EventArgs, Optional SkipConfirmation As Boolean = False) Handles ToolStripButton4.Click
+        If CheckBox4.Checked And Not SkipConfirmation Then
+            If MsgBox("Delete " + TreeView1.SelectedNode.Text + " and all its children?", MsgBoxStyle.YesNo) <> MsgBoxResult.Yes Then Exit Sub
+        End If
+
         Dim node_main As TreeNode = nodeForContextMenu2
         If node_main Is Nothing Then node_main = TreeView1.SelectedNode
 
@@ -1072,7 +1090,7 @@ Public Class Form1
         removeRecursively(node_main)
         Dim t = node_main.Parent
         node_main.Remove()
-        If t IsNot Nothing AndAlso t.Nodes.Count = 0 Then t.ImageIndex = 3 : t.SelectedImageIndex = 3
+        If t IsNot Nothing AndAlso t.Nodes.Count = 0 AndAlso t.ImageKey = "" Then t.ImageIndex = 3 : t.SelectedImageIndex = 3
 
         'handle encrypt button
         TabControl1_SelectedIndexChanged(TabControl1, New EventArgs)
@@ -1097,9 +1115,12 @@ Public Class Form1
 
         Dim f_path = SAVE_PATH + "\" + node.FullPath
         'If FileExists(f_path + ".zam") Then DeleteFile(f_path + ".zam")
-        For Each file In GetFiles(Path.GetDirectoryName(f_path + ".zam"), FileIO.SearchOption.SearchTopLevelOnly, {node.Text + ".*"})
-            DeleteFile(file)
-        Next
+        Dim dir_path = Path.GetDirectoryName(f_path + ".zam")
+        If DirectoryExists(dir_path) Then
+            For Each file In GetFiles(dir_path, FileIO.SearchOption.SearchTopLevelOnly, {node.Text + ".*"})
+                DeleteFile(file)
+            Next
+        End If
         If DirectoryExists(f_path) Then DeleteDirectory(f_path, FileIO.DeleteDirectoryOption.DeleteAllContents)
 
         Dim tabPagesToRemove As New List(Of TabPage)
@@ -1716,6 +1737,52 @@ Public Class Form1
         End If
     End Sub
 
+    'Download
+    Sub ToolStripButton32_Click(sender As Object, e As EventArgs) Handles ToolStripButton32.Click
+        Dim tab = TabControl1.SelectedTab
+        If tab IsNot Nothing Then
+            Dim rtf = tab.Controls.OfType(Of RichTextBox).First
+            If content_associatedNodes.ContainsKey(rtf) Then
+                Dim remote = content_associatedNodes(rtf).FullPath + ".zam"
+                Dim local = SAVE_PATH + "\" + remote
+                If FileExists(local) Then
+                    downloadZametka(local, remote)
+                Else
+                    MsgBox("Error: '" + local + "' not found.")
+                End If
+            Else
+                MsgBox("Error: Node not found.")
+            End If
+        Else
+            MsgBox("Error: Tab is null.")
+        End If
+    End Sub
+    'Upload
+    Async Sub ToolStripButton33_Click(sender As Object, e As EventArgs) Handles ToolStripButton33.Click
+        ToolStripButton22.Visible = True : Me.Refresh()
+
+        Dim tab = TabControl1.SelectedTab
+        If tab IsNot Nothing Then
+            Dim rtf = tab.Controls.OfType(Of RichTextBox).First
+            If content_associatedNodes.ContainsKey(rtf) Then
+                Dim remote = content_associatedNodes(rtf).FullPath + ".zam"
+                Dim local = SAVE_PATH + "\" + remote
+                If FileExists(local) Then
+                    Await ftp.UploadZam(local, remote)
+                    MsgBox("The Zametka was successfully uploaded.")
+                Else
+                    MsgBox("Error: '" + local + "' not found.")
+                End If
+            Else
+                MsgBox("Error: Node not found.")
+            End If
+        Else
+            MsgBox("Error: Tab is null.")
+        End If
+
+        ToolStripButton22.Visible = False
+    End Sub
+
     'Text formating - refresh controls
     Private Sub rtf_SelectionChanged(sender As Object, e As EventArgs)
         Dim refrWasTrue As Boolean = refr
@@ -1869,6 +1936,7 @@ Public Class Form1
         If tab Is Nothing Then MsgBox("No page selected") : Exit Sub
         Dim rtf = tab.Controls.OfType(Of RichTextBox).First
         Dim f As New SaveFileDialog
+        f.FileName = content_associatedNodes(rtf).Text
         f.Filter = "Text files (*.txt)|*.txt"
         If f.ShowDialog <> DialogResult.OK Then Exit Sub
         Dim w As New StreamWriter(f.FileName)
@@ -2681,6 +2749,83 @@ Public Class Form1
             rk.DeleteValue("ZametkeR", False)
         End If
     End Sub
+
+    'Remote Host - textbox change
+    Private Sub TextBox2_TextChanged(sender As Object, e As EventArgs) Handles TextBox2.TextChanged
+        ini.IniWriteValue("Main", "Remote_Host", TextBox2.Text.Trim)
+        ftp.host = TextBox2.Text.Trim
+    End Sub
+    'Remote Host - check
+    Private Sub Button3_Click(sender As Object, e As EventArgs) Handles Button3.Click
+        ToolStripButton22.Visible = True : Me.Refresh()
+
+        ComboBox2.Items.Clear()
+        Dim l = ftp.GetFileList()
+        If l Is Nothing Then MsgBox(ftp.last_err) : Exit Sub
+        For Each i In ftp.GetFileList()
+            ComboBox2.Items.Add(i)
+        Next
+
+        If ComboBox2.Items.Count > 0 Then ComboBox2.SelectedIndex = 0
+        ToolStripButton22.Visible = False
+    End Sub
+    'Remote Host - get
+    Private Sub Button4_Click(sender As Object, e As EventArgs) Handles Button4.Click
+        If ComboBox2.SelectedIndex < 0 Then Exit Sub
+        Dim remote_path = ComboBox2.SelectedItem.ToString
+        Dim local_path = SAVE_PATH + "\" + remote_path.Replace("/", "\")
+        downloadZametka(local_path, remote_path)
+    End Sub
+    Private Async Sub downloadZametka(local_path As String, remote_path As String)
+        ToolStripButton22.Visible = True : Me.Refresh()
+        remote_path = remote_path.Replace("\", "/")
+        Await ftp.DownloadZam(local_path, remote_path)
+
+        'Chack if exist
+        Dim node As TreeNode = Nothing
+        Dim lastNode As TreeNode = Nothing
+        If remote_path.StartsWith("/") Then remote_path = remote_path.Substring(1)
+        remote_path = remote_path.Substring(0, remote_path.Length - 4)
+        For Each n In remote_path.Split("/")
+            If node Is Nothing Then
+                node = TreeView1.Nodes().Item(n)
+            Else
+                node = node.Nodes().Item(n)
+            End If
+
+            If node Is Nothing Then
+                If lastNode Is Nothing Then
+                    node = TreeView1.Nodes.Add(n, n)
+                Else
+                    node = lastNode.Nodes.Add(n, n)
+                End If
+
+                content.Add(node, "")
+            End If
+            lastNode = node
+        Next
+
+        content(node) = load_content(local_path, node)
+
+        'Update content if it was opened
+        For Each tabpage As TabPage In TabControl1.TabPages
+            If tabpage IsNot optionsTabPage And tabpage.Text.ToUpper <> "SEARCH" And tabpage.Text.ToUpper <> "COMPARE" Then
+                'Check if this note already opened
+                Dim rtf = tabpage.Controls.OfType(Of RichTextBox).First
+                If content_associatedNodes.ContainsKey(rtf) AndAlso content_associatedNodes(rtf) Is node Then
+
+                    If content(node).ToUpper.StartsWith("{\RTF") Then
+                        rtf.Rtf = content(node)
+                    Else
+                        rtf.Text = content(node)
+                    End If
+
+                    TabControl1.SelectedTab = tabpage
+                End If
+            End If
+        Next
+        ToolStripButton22.Visible = False
+    End Sub
 #End Region
 
 #Region "Drag n drop"
@@ -2765,6 +2910,8 @@ Public Class Form1
                     Dim DestPath = DestinationNode.FullPath.ToUpper + "\"
                     If DestPath.StartsWith(DragPath) Then MsgBox("Move a node to its child node won't work.") : draggedNode = Nothing : Exit Sub
 
+                    Dim old_parent = draggedNode.Parent
+
                     If e.Effect = DragDropEffects.Move Then draggedNode.Remove()
                     new_name = getNewName(DestinationNode, draggedNode.Text, True)
                     If e.Effect = DragDropEffects.Copy Then
@@ -2782,6 +2929,13 @@ Public Class Form1
                         DestinationNode.Nodes.Add(draggedNode)
                         DestinationNode.Expand()
                     End If
+
+                    'Change parent icon to folder
+                    If draggedNode.Parent IsNot Nothing Then
+                        If draggedNode.Parent.ImageKey = "" Then draggedNode.Parent.ImageIndex = 2 : draggedNode.Parent.SelectedImageIndex = 2
+                    End If
+                    'Change old parent icon to default
+                    If old_parent IsNot Nothing AndAlso old_parent.Nodes.Count = 0 AndAlso old_parent.ImageKey = "" Then old_parent.ImageIndex = 3 : old_parent.SelectedImageIndex = 3
                 Else
                     draggedNode = Nothing : Exit Sub
                 End If
